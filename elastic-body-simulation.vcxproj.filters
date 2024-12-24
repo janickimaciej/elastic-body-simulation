@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="dep\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="dep\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="dep\glad.c" />
+    <ClCompile Include="dep\imgui\imgui.cpp" />
+    <ClCompile Include="dep\imgui\imgui_demo.cpp" />
+    <ClCompile Include="dep\imgui\imgui_draw.cpp" />
+    <ClCompile Include="dep\imgui\imgui_tables.cpp" />
+    <ClCompile Include="dep\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="dep\imgui\misc\cpp\imgui_stdlib.cpp" />
+    <ClCompile Include="src\window.cpp" />
+    <ClCompile Include="src\shaderProgram.cpp" />
+    <ClCompile Include="src\scene.cpp" />
+    <ClCompile Include="src\guis\gui.cpp" />
+    <ClCompile Include="src\camera\camera.cpp" />
+    <ClCompile Include="src\camera\perspectiveCamera.cpp" />
+    <ClCompile Include="src\mesh.cpp" />
+    <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\simulation.cpp" />
+    <ClCompile Include="src\guis\controlPanel.cpp" />
+    <ClCompile Include="dep\implot\implot.cpp" />
+    <ClCompile Include="dep\implot\implot_demo.cpp" />
+    <ClCompile Include="dep\implot\implot_items.cpp" />
+    <ClCompile Include="src\rungeKutta.cpp" />
+    <ClCompile Include="src\state.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dep\imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="dep\imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="dep\imgui\imconfig.h" />
+    <ClInclude Include="dep\imgui\imgui.h" />
+    <ClInclude Include="dep\imgui\imgui_internal.h" />
+    <ClInclude Include="dep\imgui\imstb_rectpack.h" />
+    <ClInclude Include="dep\imgui\imstb_textedit.h" />
+    <ClInclude Include="dep\imgui\imstb_truetype.h" />
+    <ClInclude Include="dep\imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="src\window.hpp" />
+    <ClInclude Include="src\shaderProgram.hpp" />
+    <ClInclude Include="src\scene.hpp" />
+    <ClInclude Include="src\guis\gui.hpp" />
+    <ClInclude Include="src\camera\perspectiveCamera.hpp" />
+    <ClInclude Include="src\camera\camera.hpp" />
+    <ClInclude Include="src\mesh.hpp" />
+    <ClInclude Include="src\model.hpp" />
+    <ClInclude Include="src\simulation.hpp" />
+    <ClInclude Include="src\guis\controlPanel.hpp" />
+    <ClInclude Include="dep\implot\implot.h" />
+    <ClInclude Include="dep\implot\implot_internal.h" />
+    <ClInclude Include="src\rungeKutta.hpp" />
+    <ClInclude Include="src\state.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\meshFS.glsl" />
+    <None Include="src\shaders\meshVS.glsl" />
+    <None Include="src\shaders\linesFS.glsl" />
+    <None Include="src\shaders\linesVS.glsl" />
+  </ItemGroup>
+</Project>
