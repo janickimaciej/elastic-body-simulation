@@ -165,6 +165,8 @@
     <ClCompile Include="dep\implot\implot.cpp" />
     <ClCompile Include="dep\implot\implot_demo.cpp" />
     <ClCompile Include="dep\implot\implot_items.cpp" />
+    <ClCompile Include="src\controlCube.cpp" />
+    <ClCompile Include="src\elasticCube.cpp" />
     <ClCompile Include="src\camera\camera.cpp" />
     <ClCompile Include="src\camera\perspectiveCamera.cpp" />
     <ClCompile Include="src\guis\controlPanel.cpp" />
@@ -191,6 +193,8 @@
     <ClInclude Include="dep\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="dep\implot\implot.h" />
     <ClInclude Include="dep\implot\implot_internal.h" />
+    <ClInclude Include="src\controlCube.hpp" />
+    <ClInclude Include="src\elasticCube.hpp" />
     <ClInclude Include="src\camera\camera.hpp" />
     <ClInclude Include="src\camera\perspectiveCamera.hpp" />
     <ClInclude Include="src\guis\controlPanel.hpp" />

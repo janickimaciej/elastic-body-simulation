@@ -11,7 +11,8 @@ class Model
 public:
 	Model(Mesh mesh, const ShaderProgram& shaderProgram, const glm::vec4& color);
 
-	virtual void render() const;
+	void updateMesh(const std::vector<Mesh::Vertex>& vertices);
+	void render() const;
 
 	glm::vec3 getPos() const;
 	void setPos(const glm::vec3& pos);

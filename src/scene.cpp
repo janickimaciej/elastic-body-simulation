@@ -5,7 +5,9 @@
 #include <glad/glad.h>
 
 #include <cmath>
+#include <cstddef>
 #include <utility>
+#include <vector>
 
 static constexpr float fovYDeg = 60.0f;
 static constexpr float nearPlane = 0.1f;
@@ -18,13 +20,31 @@ Scene::Scene(const glm::ivec2& viewportSize) :
 {
 	static constexpr glm::vec3 constraintBoxSize{10.0f, 5.0f, 5.0f};
 	static constexpr glm::vec4 constraintBoxColor{1, 1, 1, 1};
-	m_constraintBox = std::make_unique<Model>(cubeLineMesh(constraintBoxSize), m_linesShaderProgram,
-		constraintBoxColor);
-	
-	static constexpr glm::vec3 controlCubeSize = {1.0f, 1.0f, 1.0f};
+	m_constraintBoxModel = std::make_unique<Model>(cubeLineMesh(constraintBoxSize),
+		m_linesShaderProgram, constraintBoxColor);
+
+	static constexpr glm::vec4 bezierCubeColor{1, 1, 1, 1};
+	//m_bezierCubeModel = std::make_unique<Model>(bezierCubeMesh(cubeSize), m_meshShaderProgram,
+	//	bezierCubeColor);
+
+	static constexpr glm::vec4 internalSpringsColor{1, 1, 1, 1};
+	m_internalSpringsModel = std::make_unique<Model>(internalSpringsMesh(cubeSize),
+		m_linesShaderProgram, internalSpringsColor);
+
 	static constexpr glm::vec4 controlCubeColor{1, 1, 1, 1};
-	m_controlCube = std::make_unique<Model>(cubeLineMesh(controlCubeSize), m_linesShaderProgram,
+	m_controlCubeModel = std::make_unique<Model>(cubeLineMesh(cubeSize), m_linesShaderProgram,
 		controlCubeColor);
+
+	static constexpr glm::vec4 externalSpringsColor{1, 1, 1, 1};
+	m_externalSpringsModel = std::make_unique<Model>(externalSpringsMesh(cubeSize),
+		m_linesShaderProgram, externalSpringsColor);
+
+	m_elasticCube = std::make_unique<ElasticCube>(cubeSize, *m_bezierCubeModel,
+		*m_internalSpringsModel, *m_externalSpringsModel);
+	m_controlCube = std::make_unique<ControlCube>(cubeSize, *m_controlCubeModel,
+		*m_externalSpringsModel);
+	m_elasticCube->init(&*m_controlCube);
+	m_controlCube->init(&*m_elasticCube);
 }
 
 void Scene::update()
@@ -42,11 +62,23 @@ void Scene::render() const
 
 	if (m_renderConstraintBox)
 	{
-		m_constraintBox->render();
+		m_constraintBoxModel->render();
+	}
+	if (m_renderBezierCube)
+	{
+		//m_bezierCubeModel->render();
+	}
+	if (m_renderInternalSprings)
+	{
+		m_internalSpringsModel->render();
 	}
 	if (m_renderControlCube)
 	{
-		m_controlCube->render();
+		m_controlCubeModel->render();
+	}
+	if (m_renderExternalSprings)
+	{
+		m_externalSpringsModel->render();
 	}
 }
 
@@ -137,23 +169,15 @@ Simulation& Scene::getSimulation()
 
 Model& Scene::getControlCube()
 {
-	return *m_controlCube;
+	return *m_controlCubeModel;
 }
 
 Mesh Scene::cubeLineMesh(const glm::vec3& size)
 {
-	std::vector<Mesh::Vertex> vertices(8);
-	vertices[0].pos = {-0.5f, -0.5f, -0.5f};
-	vertices[1].pos = {-0.5f, -0.5f, 0.5f};
-	vertices[2].pos = {-0.5f, 0.5f, -0.5f};
-	vertices[3].pos = {-0.5f, 0.5f, 0.5f};
-	vertices[4].pos = {0.5f, -0.5f, -0.5f};
-	vertices[5].pos = {0.5f, -0.5f, 0.5f};
-	vertices[6].pos = {0.5f, 0.5f, -0.5f};
-	vertices[7].pos = {0.5f, 0.5f, 0.5f};
-	for (Mesh::Vertex& vertex : vertices)
+	std::vector<Mesh::Vertex> vertices{};
+	for (const glm::vec3& vertexPos : ControlCube::createVertices(size))
 	{
-		vertex.pos *= size;
+		vertices.push_back({vertexPos, {}});
 	}
 
 	std::vector<unsigned int> indices =
@@ -173,6 +197,59 @@ Mesh Scene::cubeLineMesh(const glm::vec3& size)
 	};
 
 	return Mesh{vertices, indices, true};
+}
+
+Mesh Scene::bezierCubeMesh(const glm::vec3& size)
+{
+	std::vector<Mesh::Vertex> vertices{};
+	for (const glm::vec3& vertexPos : ElasticCube::createVertices(size))
+	{
+		vertices.push_back({vertexPos, {}});
+	}
+
+	std::vector<unsigned int> indices{}; // TODO
+
+	return Mesh{vertices, indices, false, true};
+}
+
+Mesh Scene::internalSpringsMesh(const glm::vec3& size)
+{
+	std::vector<Mesh::Vertex> vertices{};
+	for (const glm::vec3& vertexPos : ElasticCube::createVertices(size))
+	{
+		vertices.push_back({vertexPos, {}});
+	}
+	
+	std::vector<unsigned int> indices{};
+	for (const std::pair<std::size_t, std::size_t>& spring : ElasticCube::createSprings())
+	{
+		indices.push_back(static_cast<unsigned int>(spring.first));
+		indices.push_back(static_cast<unsigned int>(spring.second));
+	}
+
+	return Mesh{vertices, indices, true, true};
+}
+
+Mesh Scene::externalSpringsMesh(const glm::vec3& size)
+{
+	std::vector<Mesh::Vertex> vertices{};
+	for (const glm::vec3& vertexPos : ControlCube::createVertices(size))
+	{
+		vertices.push_back({vertexPos, {}});
+	}
+	for (const glm::vec3& vertexPos : ElasticCube::createCorners(size))
+	{
+		vertices.push_back({vertexPos, {}});
+	}
+
+	std::vector<unsigned int> indices{};
+	for (unsigned int i = 0; i < vertices.size() / 2; ++i)
+	{
+		indices.push_back(i);
+		indices.push_back(i + static_cast<unsigned int>(vertices.size()) / 2);
+	}
+
+	return Mesh{vertices, indices, true, true};
 }
 
 void Scene::setAspectRatio(float aspectRatio)

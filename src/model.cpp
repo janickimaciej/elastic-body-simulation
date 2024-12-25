@@ -8,6 +8,11 @@ Model::Model(Mesh mesh, const ShaderProgram& shaderProgram, const glm::vec4& col
 	m_color{color}
 { }
 
+void Model::updateMesh(const std::vector<Mesh::Vertex>& vertices)
+{
+	m_mesh.update(vertices);
+}
+
 void Model::render() const
 {
 	m_shaderProgram.use();

@@ -26,6 +26,8 @@
     <ClCompile Include="dep\implot\implot_items.cpp" />
     <ClCompile Include="src\rungeKutta.cpp" />
     <ClCompile Include="src\state.cpp" />
+    <ClCompile Include="src\elasticCube.cpp" />
+    <ClCompile Include="src\controlCube.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dep\imgui\backends\imgui_impl_glfw.h" />
@@ -51,6 +53,8 @@
     <ClInclude Include="dep\implot\implot_internal.h" />
     <ClInclude Include="src\rungeKutta.hpp" />
     <ClInclude Include="src\state.hpp" />
+    <ClInclude Include="src\elasticCube.hpp" />
+    <ClInclude Include="src\controlCube.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\meshFS.glsl" />
