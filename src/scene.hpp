@@ -1,8 +1,6 @@
 #pragma once
 
 #include "camera/perspectiveCamera.hpp"
-#include "controlCube.hpp"
-#include "elasticCube.hpp"
 #include "model.hpp"
 #include "shaderProgram.hpp"
 #include "simulation.hpp"
@@ -38,7 +36,6 @@ public:
 	void setRenderExternalSprings(bool renderExternalSprings);
 
 	Simulation& getSimulation();
-	Model& getControlCube();
 
 private:
 	ShaderProgram m_meshShaderProgram{"src/shaders/meshVS.glsl", "src/shaders/meshFS.glsl"};

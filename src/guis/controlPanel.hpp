@@ -23,7 +23,8 @@ private:
 
 	void updateInputFloat(const std::function<float()>& get, const std::function<void(float)>& set,
 		const std::string& name, std::optional<float> min = std::nullopt,
-		const std::string& format = "%.1f", float step = 0.1f);
+		std::optional<float> max = std::nullopt, const std::string& format = "%.1f",
+		float step = 0.1f);
 	void updateInputInt(const std::function<int()>& get, const std::function<void(int)>& set,
 		const std::string& name, std::optional<int> min = std::nullopt);
 	void updateDragFloat(const std::function<float()>& get, const std::function<void(float)>& set,

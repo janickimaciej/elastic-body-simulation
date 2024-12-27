@@ -9,9 +9,15 @@ ControlCube::ControlCube(const glm::vec3& size)
 	m_vertices = createVertices(size);
 }
 
-std::vector<glm::vec3> ControlCube::getVertices() const
+std::vector<glm::vec3> ControlCube::getCorners() const
 {
-	return m_vertices;
+	std::vector<glm::vec3> corners{};
+	for (const glm::vec3& vertex : m_vertices)
+	{
+		glm::vec4 affineVertex{vertex, 1};
+		corners.push_back({getMatrix() * affineVertex});
+	}
+	return corners;
 }
 
 std::vector<glm::vec3> ControlCube::createVertices(const glm::vec3& size)

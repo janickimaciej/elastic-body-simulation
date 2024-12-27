@@ -1,5 +1,7 @@
 #include "guis/controlPanel.hpp"
 
+#include "controlCube.hpp"
+
 #include <imgui/imgui.h>
 
 #include <algorithm>
@@ -43,6 +45,7 @@ void ControlPanel::update()
 		[this] (float dt) { m_simulation.setDT(dt); },
 		"dt",
 		0.001f,
+		std::nullopt,
 		"%.3f",
 		0.001f
 	);
@@ -76,7 +79,22 @@ void ControlPanel::update()
 		[this] () { return m_simulation.getDamping(); },
 		[this] (float damping) { m_simulation.setDamping(damping); },
 		"damping",
-		0.0f
+		0.0f,
+		std::nullopt,
+		"%.2f",
+		0.01f
+	);
+
+	updateInputFloat
+	(
+		[this] () { return m_simulation.getCollisionElasticity(); },
+		[this] (float collisionElasticity)
+		{
+			m_simulation.setCollisionElasticity(collisionElasticity);
+		},
+		"collision elasticity",
+		0.0f,
+		1.0f
 	);
 
 	updateInputFloat
@@ -91,6 +109,13 @@ void ControlPanel::update()
 	);
 
 	separator();
+
+	updateCheckbox
+	(
+		[this] () { return m_simulation.getExternalSprings(); },
+		[this] (bool externalSprings) { m_simulation.setExternalSprings(externalSprings); },
+		"external springs"
+	);
 
 	updateCheckbox
 	(
@@ -146,10 +171,10 @@ void ControlPanel::update()
 
 	updateDragFloat
 	(
-		[this] () { return m_scene.getControlCube().getPos().x; },
+		[this] () { return m_scene.getSimulation().getControlCube().getPos().x; },
 		[this] (float x)
 		{
-			Model& cube = m_scene.getControlCube();
+			ControlCube& cube = m_scene.getSimulation().getControlCube();
 			glm::vec3 pos = cube.getPos();
 			pos.x = x;
 			cube.setPos(pos);
@@ -159,10 +184,10 @@ void ControlPanel::update()
 
 	updateDragFloat
 	(
-		[this] () { return m_scene.getControlCube().getPos().y; },
+		[this] () { return m_scene.getSimulation().getControlCube().getPos().y; },
 		[this] (float y)
 		{
-			Model& cube = m_scene.getControlCube();
+			ControlCube& cube = m_scene.getSimulation().getControlCube();
 			glm::vec3 pos = cube.getPos();
 			pos.y = y;
 			cube.setPos(pos);
@@ -172,10 +197,10 @@ void ControlPanel::update()
 
 	updateDragFloat
 	(
-		[this] () { return m_scene.getControlCube().getPos().z; },
+		[this] () { return m_scene.getSimulation().getControlCube().getPos().z; },
 		[this] (float z)
 		{
-			Model& cube = m_scene.getControlCube();
+			ControlCube& cube = m_scene.getSimulation().getControlCube();
 			glm::vec3 pos = cube.getPos();
 			pos.z = z;
 			cube.setPos(pos);
@@ -185,10 +210,10 @@ void ControlPanel::update()
 
 	updateDragFloat
 	(
-		[this] () { return glm::degrees(m_scene.getControlCube().getPitchRad()); },
+		[this] () { return glm::degrees(m_scene.getSimulation().getControlCube().getPitchRad()); },
 		[this] (float pitchDeg)
 		{
-			Model& cube = m_scene.getControlCube();
+			ControlCube& cube = m_scene.getSimulation().getControlCube();
 			cube.setPitchRad(glm::radians(pitchDeg));
 		},
 		"pitch",
@@ -197,10 +222,10 @@ void ControlPanel::update()
 
 	updateDragFloat
 	(
-		[this] () { return glm::degrees(m_scene.getControlCube().getYawRad()); },
+		[this] () { return glm::degrees(m_scene.getSimulation().getControlCube().getYawRad()); },
 		[this] (float yawDeg)
 		{
-			Model& cube = m_scene.getControlCube();
+			ControlCube& cube = m_scene.getSimulation().getControlCube();
 			cube.setYawRad(glm::radians(yawDeg));
 		},
 		"yaw",
@@ -209,10 +234,10 @@ void ControlPanel::update()
 
 	updateDragFloat
 	(
-		[this] () { return glm::degrees(m_scene.getControlCube().getRollRad()); },
+		[this] () { return glm::degrees(m_scene.getSimulation().getControlCube().getRollRad()); },
 		[this] (float rollDeg)
 		{
-			Model& cube = m_scene.getControlCube();
+			ControlCube& cube = m_scene.getSimulation().getControlCube();
 			cube.setRollRad(glm::radians(rollDeg));
 		},
 		"roll",
@@ -231,7 +256,7 @@ void ControlPanel::update()
 
 void ControlPanel::updateInputFloat(const std::function<float()>& get,
 	const std::function<void(float)>& set, const std::string& name, std::optional<float> min,
-	const std::string& format, float step)
+	std::optional<float> max, const std::string& format, float step)
 {
 	static const std::string suffix = "##controlPanelInputFloat";
 
@@ -243,6 +268,10 @@ void ControlPanel::updateInputFloat(const std::function<float()>& get,
 	if (min.has_value())
 	{
 		value = std::max(value, *min);
+	}
+	if (max.has_value())
+	{
+		value = std::min(value, *max);
 	}
 	if (value != prevValue)
 	{

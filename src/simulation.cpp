@@ -2,6 +2,9 @@
 
 #include "rungeKutta.hpp"
 
+#include <glm/gtc/random.hpp>
+
+#include <algorithm>
 #include <cmath>
 
 Simulation::Simulation(Model& bezierCubeModel, Model& internalSpringsModel, Model& controlCubeModel,
@@ -12,6 +15,8 @@ Simulation::Simulation(Model& bezierCubeModel, Model& internalSpringsModel, Mode
 	m_externalSpringsModel{externalSpringsModel}
 {
 	start();
+	std::vector<glm::vec3> vertices = ElasticCube::createVertices(cubeSize);
+	std::copy(vertices.begin(), vertices.end(), m_state.positions.begin());
 }
 
 void Simulation::update()
@@ -34,9 +39,13 @@ void Simulation::update()
 				return getRHS(state).toArray();
 			}
 		)};
+		processCollisions();
 
 		m_t.push_back(t);
 	}
+
+	updateElasticCube();
+	updateModels();
 }
 
 void Simulation::stop()
@@ -60,7 +69,18 @@ void Simulation::start()
 
 void Simulation::disturb()
 {
-	// TODO
+	for (glm::vec3& velocity : m_state.velocities)
+	{
+		float randCoefficient = m_uniformDistribution(m_randomEngine);
+		glm::vec3 randomVector{};
+		while (randomVector.x == 0 && randomVector.y == 0 && randomVector.z == 0)
+		{
+			randomVector = glm::vec3{m_normalDistribution(m_randomEngine),
+				m_normalDistribution(m_randomEngine), m_normalDistribution(m_randomEngine)};
+		}
+		glm::vec3 randomDirection = glm::normalize(randomVector);
+		velocity += randCoefficient * m_disturbanceVelocity * randomDirection;
+	}
 }
 
 glm::mat3 Simulation::initialRotation()
@@ -142,6 +162,16 @@ void Simulation::setDamping(float damping)
 	m_damping = damping;
 }
 
+float Simulation::getCollisionElasticity() const
+{
+	return m_collisionElasticity;
+}
+
+void Simulation::setCollisionElasticity(float collisionElasticity)
+{
+	m_collisionElasticity = collisionElasticity;
+}
+
 float Simulation::getDisturbanceVelocity() const
 {
 	return m_disturbanceVelocity;
@@ -150,6 +180,16 @@ float Simulation::getDisturbanceVelocity() const
 void Simulation::setDisturbanceVelocity(float disturbanceVelocity)
 {
 	m_disturbanceVelocity = disturbanceVelocity;
+}
+
+bool Simulation::getExternalSprings() const
+{
+	return m_externalSprings;
+}
+
+void Simulation::setExternalSprings(bool externalsprings)
+{
+	m_externalSprings = externalsprings;
 }
 
 bool Simulation::getGravity() const
@@ -176,6 +216,11 @@ float Simulation::getT() const
 	return m_t.back();
 }
 
+ControlCube& Simulation::getControlCube()
+{
+	return m_controlCube;
+}
+
 float Simulation::getSimulationTime() const
 {
 	std::chrono::time_point<std::chrono::system_clock> t = std::chrono::system_clock::now();
@@ -192,9 +237,38 @@ State Simulation::getRHS(const State& state) const
 {
 	State stateDerivative{};
 
-	// TODO
+	for (int i = 0; i < 64; ++i)
+	{
+		stateDerivative.positions[i] = state.velocities[i];
+	}
+
+	std::vector<glm::vec3> internalSpringsForces = getInternalSpringsForces(state);
+	std::vector<glm::vec3> externalSpringsForces = getExternalSpringsForces(state);
+	std::vector<glm::vec3> dampingForces = getDampingForces(state);
+	std::vector<glm::vec3> gravityForces = getGravityForces();
+
+	for (int i = 0; i < 64; ++i)
+	{
+		glm::vec3 force = internalSpringsForces[i] + dampingForces[i];
+		if (m_externalSprings)
+		{
+			force += externalSpringsForces[i];
+		}
+		if (m_gravity)
+		{
+			force += gravityForces[i];
+		}
+		stateDerivative.velocities[i] = force / particleMass();
+	}
 
 	return stateDerivative;
+}
+
+void Simulation::updateElasticCube()
+{
+	std::vector<glm::vec3> vertices(64);
+	std::copy(m_state.positions.begin(), m_state.positions.end(), vertices.begin());
+	m_elasticCube.setVertices(vertices);
 }
 
 void Simulation::updateModels() const
@@ -212,7 +286,7 @@ void Simulation::updateBezierCubeModel() const
 	{
 		vertices.push_back({vertexPos, {}});
 	}
-	m_bezierCubeModel.updateMesh(std::move(vertices));
+	//m_bezierCubeModel.updateMesh(std::move(vertices));
 }
 
 void Simulation::updateInternalSpringsModel() const
@@ -227,18 +301,16 @@ void Simulation::updateInternalSpringsModel() const
 
 void Simulation::updateControlCubeModel() const
 {
-	std::vector<Mesh::Vertex> vertices{};
-	for (const glm::vec3& vertexPos : m_controlCube.getVertices())
-	{
-		vertices.push_back({vertexPos, {}});
-	}
-	m_controlCubeModel.updateMesh(std::move(vertices));
+	m_controlCubeModel.setPos(m_controlCube.getPos());
+	m_controlCubeModel.setPitchRad(m_controlCube.getPitchRad());
+	m_controlCubeModel.setYawRad(m_controlCube.getYawRad());
+	m_controlCubeModel.setRollRad(m_controlCube.getRollRad());
 }
 
 void Simulation::updateExternalSpringsModel() const
 {
 	std::vector<Mesh::Vertex> vertices{};
-	for (const glm::vec3& vertexPos : m_controlCube.getVertices())
+	for (const glm::vec3& vertexPos : m_controlCube.getCorners())
 	{
 		vertices.push_back({vertexPos, {}});
 	}
@@ -249,22 +321,90 @@ void Simulation::updateExternalSpringsModel() const
 	m_externalSpringsModel.updateMesh(std::move(vertices));
 }
 
-std::vector<glm::vec3> Simulation::internalSpringsForces()
+std::vector<glm::vec3> Simulation::getInternalSpringsForces(const State& state) const
 {
-	return {}; // TODO
+	std::vector<glm::vec3> forces(64);
+	static const std::vector<glm::vec3> referenceVertices = ElasticCube::createVertices(cubeSize);
+	for (const std::pair<std::size_t, std::size_t>& spring : m_elasticCube.createSprings())
+	{
+		float equilibriumLength = glm::length(referenceVertices[spring.second] -
+			referenceVertices[spring.first]);
+		glm::vec3 springVector = state.positions[spring.second] - state.positions[spring.first];
+		glm::vec3 springDirection = glm::normalize(springVector);
+		float displacement = glm::length(springVector) - equilibriumLength;
+		glm::vec3 force = m_internalStiffness * displacement * springDirection;
+		forces[spring.first] += force;
+		forces[spring.second] -= force;
+	}
+	return forces;
 }
 
-std::vector<glm::vec3> Simulation::externalSpringsForces()
+std::vector<glm::vec3> Simulation::getExternalSpringsForces(const State& state) const
 {
-	return {}; // TODO
+	std::vector<glm::vec3> forces(64);
+	std::vector<glm::vec3> controlCubeCorners = m_controlCube.getCorners();
+	std::vector<std::size_t> cornerIndices = ElasticCube::cornerIndices();
+	for (int i = 0; i < 8; ++i)
+	{
+		glm::vec3 springVector = controlCubeCorners[i] - state.positions[cornerIndices[i]];
+		forces[cornerIndices[i]] += m_externalStiffness * springVector;
+	}
+	return forces;
 }
 
-std::vector<glm::vec3> Simulation::dampingForces()
+std::vector<glm::vec3> Simulation::getDampingForces(const State& state) const
 {
-	return {}; // TODO
+	std::vector<glm::vec3> forces(64);
+	for (int i = 0; i < 64; ++i)
+	{
+		forces[i] = -m_damping * state.velocities[i];
+	}
+	return forces;
 }
 
-std::vector<glm::vec3> Simulation::gravityForces()
+std::vector<glm::vec3> Simulation::getGravityForces() const
 {
-	return std::vector<glm::vec3>(64, glm::vec3{0, -9.81f * m_mass / 64, 0});
+	return std::vector<glm::vec3>(64, glm::vec3{0, -9.81f * particleMass(), 0});
+}
+
+void Simulation::processCollisions()
+{
+	for (int i = 0; i < 64; ++i)
+	{
+		bool collision = true;
+		while (collision)
+		{
+			collision = false;
+			collision |= processCollision(false, -constraintBoxSize.x / 2, m_state.positions[i].x,
+				m_state.velocities[i].x);
+			collision |= processCollision(true, constraintBoxSize.x / 2, m_state.positions[i].x,
+				m_state.velocities[i].x);
+			collision |= processCollision(false, -constraintBoxSize.y / 2, m_state.positions[i].y,
+				m_state.velocities[i].y);
+			collision |= processCollision(true, constraintBoxSize.y / 2, m_state.positions[i].y,
+				m_state.velocities[i].y);
+			collision |= processCollision(false, -constraintBoxSize.z / 2, m_state.positions[i].z,
+				m_state.velocities[i].z);
+			collision |= processCollision(true, constraintBoxSize.z / 2, m_state.positions[i].z,
+				m_state.velocities[i].z);
+		}
+	}
+}
+
+bool Simulation::processCollision(bool isWallPositive, float wallPosition, float& particlePosition,
+	float& particleVelocity) const
+{
+	float wallDistance = particlePosition - wallPosition;
+	if (isWallPositive ? wallDistance > 0 : wallDistance < 0)
+	{
+		particlePosition = wallPosition - m_collisionElasticity * wallDistance;
+		particleVelocity *= m_collisionElasticity;
+		return true;
+	}
+	return false;
+}
+
+float Simulation::particleMass() const
+{
+	return m_mass / 64;
 }

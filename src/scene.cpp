@@ -18,10 +18,9 @@ Scene::Scene(const glm::ivec2& viewportSize) :
 	m_camera{fovYDeg, static_cast<float>(viewportSize.x) / viewportSize.y, nearPlane, farPlane,
 		m_meshShaderProgram, m_linesShaderProgram}
 {
-	static constexpr glm::vec3 constraintBoxSize{10.0f, 5.0f, 5.0f};
-	static constexpr glm::vec4 constraintBoxColor{1, 1, 1, 1};
-	m_constraintBoxModel = std::make_unique<Model>(cubeLineMesh(constraintBoxSize),
-		m_linesShaderProgram, constraintBoxColor);
+	static constexpr glm::vec4 constraintBoxColor{0, 0, 1, 1};
+	m_constraintBoxModel = std::make_unique<Model>(cubeLineMesh(Simulation::constraintBoxSize),
+		m_linesShaderProgram, constraintBoxColor, true);
 
 	static constexpr glm::vec4 bezierCubeColor{1, 1, 1, 1};
 	//m_bezierCubeModel = std::make_unique<Model>(bezierCubeMesh(Simulation::cubeSize),
@@ -31,9 +30,9 @@ Scene::Scene(const glm::ivec2& viewportSize) :
 	m_internalSpringsModel = std::make_unique<Model>(internalSpringsMesh(Simulation::cubeSize),
 		m_linesShaderProgram, internalSpringsColor);
 
-	static constexpr glm::vec4 controlCubeColor{1, 1, 1, 1};
+	static constexpr glm::vec4 controlCubeColor{1, 0, 0, 1};
 	m_controlCubeModel = std::make_unique<Model>(cubeLineMesh(Simulation::cubeSize),
-		m_linesShaderProgram, controlCubeColor);
+		m_linesShaderProgram, controlCubeColor, true);
 
 	static constexpr glm::vec4 externalSpringsColor{1, 1, 1, 1};
 	m_externalSpringsModel = std::make_unique<Model>(externalSpringsMesh(Simulation::cubeSize),
@@ -163,11 +162,6 @@ Simulation& Scene::getSimulation()
 	return *m_simulation;
 }
 
-Model& Scene::getControlCube()
-{
-	return *m_controlCubeModel;
-}
-
 Mesh Scene::cubeLineMesh(const glm::vec3& size)
 {
 	std::vector<Mesh::Vertex> vertices{};
@@ -217,7 +211,7 @@ Mesh Scene::internalSpringsMesh(const glm::vec3& size)
 	}
 	
 	std::vector<unsigned int> indices{};
-	for (const std::pair<std::size_t, std::size_t>& spring : ElasticCube::createSprings())
+	for (const std::pair<std::size_t, std::size_t>& spring : ElasticCube::createShortSprings())
 	{
 		indices.push_back(static_cast<unsigned int>(spring.first));
 		indices.push_back(static_cast<unsigned int>(spring.second));

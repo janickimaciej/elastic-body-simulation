@@ -1,5 +1,6 @@
 #pragma once
 
+#include "frame.hpp"
 #include "model.hpp"
 
 #include <glm/glm.hpp>
@@ -7,13 +8,11 @@
 #include <cstddef>
 #include <vector>
 
-class ElasticCube;
-
-class ControlCube
+class ControlCube : public Frame
 {
 public:
 	ControlCube(const glm::vec3& size);
-	std::vector<glm::vec3> getVertices() const;
+	std::vector<glm::vec3> getCorners() const;
 
 	static std::vector<glm::vec3> createVertices(const glm::vec3& size);
 
