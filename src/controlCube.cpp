@@ -4,17 +4,9 @@
 
 #include <utility>
 
-ControlCube::ControlCube(const glm::vec3& size, Model& controlCubeModel,
-	Model& externalSpringsModel) :
-	m_controlCubeModel{controlCubeModel},
-	m_externalSpringsModel{externalSpringsModel}
+ControlCube::ControlCube(const glm::vec3& size)
 {
 	m_vertices = createVertices(size);
-}
-
-void ControlCube::init(const ElasticCube* elasticCube)
-{
-	m_elasticCube = elasticCube;
 }
 
 std::vector<glm::vec3> ControlCube::getVertices() const
@@ -39,36 +31,6 @@ std::vector<glm::vec3> ControlCube::createVertices(const glm::vec3& size)
 		}
 	}
 	return vertices;
-}
-
-void ControlCube::updateModels() const
-{
-	updateExternalSpringsModel();
-	updateControlCubeModel();
-}
-
-void ControlCube::updateExternalSpringsModel() const
-{
-	std::vector<Mesh::Vertex> vertices{};
-	for (const glm::vec3& vertexPos : getVertices())
-	{
-		vertices.push_back({vertexPos, {}});
-	}
-	for (const glm::vec3& vertexPos : m_elasticCube->getCorners())
-	{
-		vertices.push_back({vertexPos, {}});
-	}
-	m_externalSpringsModel.updateMesh(std::move(vertices));
-}
-
-void ControlCube::updateControlCubeModel() const
-{
-	std::vector<Mesh::Vertex> vertices{};
-	for (const glm::vec3& vertexPos : getVertices())
-	{
-		vertices.push_back({vertexPos, {}});
-	}
-	m_controlCubeModel.updateMesh(std::move(vertices));
 }
 
 std::size_t ControlCube::index(std::size_t xi, std::size_t yi, std::size_t zi)

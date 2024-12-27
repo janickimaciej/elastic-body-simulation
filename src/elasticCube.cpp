@@ -4,19 +4,10 @@
 
 #include <utility>
 
-ElasticCube::ElasticCube(const glm::vec3& size, Model& bezierCubeModel, Model& internalSpringsModel,
-	Model& externalSpringsModel) :
-	m_bezierCubeModel{bezierCubeModel},
-	m_internalSpringsModel{internalSpringsModel},
-	m_externalSpringsModel{externalSpringsModel}
+ElasticCube::ElasticCube(const glm::vec3& size)
 {
 	m_vertices = createVertices(size);
 	m_springs = createSprings();
-}
-
-void ElasticCube::init(const ControlCube* controlCube)
-{
-	m_controlCube = controlCube;
 }
 
 std::vector<glm::vec3> ElasticCube::getVertices() const
@@ -116,47 +107,6 @@ std::vector<std::pair<std::size_t, std::size_t>> ElasticCube::createSprings()
 		}
 	}
 	return springs;
-}
-
-void ElasticCube::updateModels() const
-{
-	updateBezierCubeModel();
-	updateInternalSpringsModel();
-	updateExternalSpringsModel();
-}
-
-void ElasticCube::updateBezierCubeModel() const
-{
-	std::vector<Mesh::Vertex> vertices{};
-	for (const glm::vec3& vertexPos : getVertices())
-	{
-		vertices.push_back({vertexPos, {}});
-	}
-	m_bezierCubeModel.updateMesh(std::move(vertices));
-}
-
-void ElasticCube::updateInternalSpringsModel() const
-{
-	std::vector<Mesh::Vertex> vertices{};
-	for (const glm::vec3& vertexPos : getVertices())
-	{
-		vertices.push_back({vertexPos, {}});
-	}
-	m_internalSpringsModel.updateMesh(std::move(vertices));
-}
-
-void ElasticCube::updateExternalSpringsModel() const
-{
-	std::vector<Mesh::Vertex> vertices{};
-	for (const glm::vec3& vertexPos : m_controlCube->getVertices())
-	{
-		vertices.push_back({vertexPos, {}});
-	}
-	for (const glm::vec3& vertexPos : getCorners())
-	{
-		vertices.push_back({vertexPos, {}});
-	}
-	m_externalSpringsModel.updateMesh(std::move(vertices));
 }
 
 std::size_t ElasticCube::index(std::size_t xi, std::size_t yi, std::size_t zi)

@@ -2,29 +2,30 @@
 
 State::State(const RungeKutta::State& state)
 {
-	orientation.w = state[0];
-	orientation.x = state[1];
-	orientation.y = state[2];
-	orientation.z = state[3];
-	angVelocity.x = state[4];
-	angVelocity.y = state[5];
-	angVelocity.z = state[6];
+	for (std::size_t i = 0; i < 64; ++i)
+	{
+		positions[i].x = state[3 * i];
+		positions[i].y = state[3 * i + 1];
+		positions[i].z = state[3 * i + 2];
+		static constexpr std::size_t offset = 3 * 64;
+		velocities[i].x = state[offset + 3 * i];
+		velocities[i].y = state[offset + 3 * i + 1];
+		velocities[i].z = state[offset + 3 * i + 2];
+	}
 }
 
 RungeKutta::State State::toArray() const
 {
 	RungeKutta::State state{};
-	state[0] = orientation.w;
-	state[1] = orientation.x;
-	state[2] = orientation.y;
-	state[3] = orientation.z;
-	state[4] = angVelocity.x;
-	state[5] = angVelocity.y;
-	state[6] = angVelocity.z;
+	for (std::size_t i = 0; i < 64; ++i)
+	{
+		state[3 * i] = positions[i].x;
+		state[3 * i + 1] = positions[i].y;
+		state[3 * i + 2] = positions[i].z;
+		static constexpr std::size_t offset = 3 * 64;
+		state[offset + 3 * i] = velocities[i].x;
+		state[offset + 3 * i + 1] = velocities[i].y;
+		state[offset + 3 * i + 2] = velocities[i].z;
+	}
 	return state;
-}
-
-void State::normalize()
-{
-	orientation = glm::normalize(orientation);
 }

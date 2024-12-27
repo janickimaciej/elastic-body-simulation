@@ -4,7 +4,12 @@
 
 #include <cmath>
 
-Simulation::Simulation()
+Simulation::Simulation(Model& bezierCubeModel, Model& internalSpringsModel, Model& controlCubeModel,
+	Model& externalSpringsModel) :
+	m_bezierCubeModel{bezierCubeModel},
+	m_internalSpringsModel{internalSpringsModel},
+	m_controlCubeModel{controlCubeModel},
+	m_externalSpringsModel{externalSpringsModel}
 {
 	start();
 }
@@ -29,7 +34,6 @@ void Simulation::update()
 				return getRHS(state).toArray();
 			}
 		)};
-		m_state.normalize();
 
 		m_t.push_back(t);
 	}
@@ -172,11 +176,6 @@ float Simulation::getT() const
 	return m_t.back();
 }
 
-glm::quat Simulation::getOrientation() const
-{
-	return m_state.orientation;
-}
-
 float Simulation::getSimulationTime() const
 {
 	std::chrono::time_point<std::chrono::system_clock> t = std::chrono::system_clock::now();
@@ -193,20 +192,79 @@ State Simulation::getRHS(const State& state) const
 {
 	State stateDerivative{};
 
-	glm::vec3 torque = {0, 0, 0};
-	if (m_gravity)
-	{
-		static constexpr float g = 9.81f;
-
-		glm::vec3 gravityGlobal{0, -m_mass * g, 0};
-		glm::vec3 gravity = glm::conjugate(state.orientation) * gravityGlobal;
-		torque = glm::cross(glm::vec3{0, std::sqrt(3.0f) * 0.5f, 0}, gravity);
-	}
-
-	stateDerivative.orientation = state.orientation * glm::quat{0, state.angVelocity} * 0.5f;
-
-	stateDerivative.angVelocity = (torque +
-		glm::cross(state.angVelocity, state.angVelocity));
+	// TODO
 
 	return stateDerivative;
+}
+
+void Simulation::updateModels() const
+{
+	updateBezierCubeModel();
+	updateInternalSpringsModel();
+	updateControlCubeModel();
+	updateExternalSpringsModel();
+}
+
+void Simulation::updateBezierCubeModel() const
+{
+	std::vector<Mesh::Vertex> vertices{};
+	for (const glm::vec3& vertexPos : m_elasticCube.getVertices())
+	{
+		vertices.push_back({vertexPos, {}});
+	}
+	m_bezierCubeModel.updateMesh(std::move(vertices));
+}
+
+void Simulation::updateInternalSpringsModel() const
+{
+	std::vector<Mesh::Vertex> vertices{};
+	for (const glm::vec3& vertexPos : m_elasticCube.getVertices())
+	{
+		vertices.push_back({vertexPos, {}});
+	}
+	m_internalSpringsModel.updateMesh(std::move(vertices));
+}
+
+void Simulation::updateControlCubeModel() const
+{
+	std::vector<Mesh::Vertex> vertices{};
+	for (const glm::vec3& vertexPos : m_controlCube.getVertices())
+	{
+		vertices.push_back({vertexPos, {}});
+	}
+	m_controlCubeModel.updateMesh(std::move(vertices));
+}
+
+void Simulation::updateExternalSpringsModel() const
+{
+	std::vector<Mesh::Vertex> vertices{};
+	for (const glm::vec3& vertexPos : m_controlCube.getVertices())
+	{
+		vertices.push_back({vertexPos, {}});
+	}
+	for (const glm::vec3& vertexPos : m_elasticCube.getCorners())
+	{
+		vertices.push_back({vertexPos, {}});
+	}
+	m_externalSpringsModel.updateMesh(std::move(vertices));
+}
+
+std::vector<glm::vec3> Simulation::internalSpringsForces()
+{
+	return {}; // TODO
+}
+
+std::vector<glm::vec3> Simulation::externalSpringsForces()
+{
+	return {}; // TODO
+}
+
+std::vector<glm::vec3> Simulation::dampingForces()
+{
+	return {}; // TODO
+}
+
+std::vector<glm::vec3> Simulation::gravityForces()
+{
+	return std::vector<glm::vec3>(64, glm::vec3{0, -9.81f * m_mass / 64, 0});
 }

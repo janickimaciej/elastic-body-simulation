@@ -58,10 +58,7 @@ private:
 	bool m_renderControlCube = true;
 	bool m_renderExternalSprings = false;
 	
-	static constexpr glm::vec3 cubeSize = {1.0f, 1.0f, 1.0f};
-	std::unique_ptr<ElasticCube> m_elasticCube{};
-	std::unique_ptr<ControlCube> m_controlCube{};
-	Simulation m_simulation{};
+	std::unique_ptr<Simulation> m_simulation{};
 
 	static Mesh cubeLineMesh(const glm::vec3& size);
 	static Mesh bezierCubeMesh(const glm::vec3& size);

@@ -24,32 +24,28 @@ Scene::Scene(const glm::ivec2& viewportSize) :
 		m_linesShaderProgram, constraintBoxColor);
 
 	static constexpr glm::vec4 bezierCubeColor{1, 1, 1, 1};
-	//m_bezierCubeModel = std::make_unique<Model>(bezierCubeMesh(cubeSize), m_meshShaderProgram,
-	//	bezierCubeColor);
+	//m_bezierCubeModel = std::make_unique<Model>(bezierCubeMesh(Simulation::cubeSize),
+	//	m_meshShaderProgram, bezierCubeColor);
 
 	static constexpr glm::vec4 internalSpringsColor{1, 1, 1, 1};
-	m_internalSpringsModel = std::make_unique<Model>(internalSpringsMesh(cubeSize),
+	m_internalSpringsModel = std::make_unique<Model>(internalSpringsMesh(Simulation::cubeSize),
 		m_linesShaderProgram, internalSpringsColor);
 
 	static constexpr glm::vec4 controlCubeColor{1, 1, 1, 1};
-	m_controlCubeModel = std::make_unique<Model>(cubeLineMesh(cubeSize), m_linesShaderProgram,
-		controlCubeColor);
+	m_controlCubeModel = std::make_unique<Model>(cubeLineMesh(Simulation::cubeSize),
+		m_linesShaderProgram, controlCubeColor);
 
 	static constexpr glm::vec4 externalSpringsColor{1, 1, 1, 1};
-	m_externalSpringsModel = std::make_unique<Model>(externalSpringsMesh(cubeSize),
+	m_externalSpringsModel = std::make_unique<Model>(externalSpringsMesh(Simulation::cubeSize),
 		m_linesShaderProgram, externalSpringsColor);
 
-	m_elasticCube = std::make_unique<ElasticCube>(cubeSize, *m_bezierCubeModel,
-		*m_internalSpringsModel, *m_externalSpringsModel);
-	m_controlCube = std::make_unique<ControlCube>(cubeSize, *m_controlCubeModel,
-		*m_externalSpringsModel);
-	m_elasticCube->init(&*m_controlCube);
-	m_controlCube->init(&*m_elasticCube);
+	m_simulation = std::make_unique<Simulation>(*m_bezierCubeModel, *m_internalSpringsModel,
+		*m_controlCubeModel, *m_externalSpringsModel);
 }
 
 void Scene::update()
 {
-	m_simulation.update();
+	m_simulation->update();
 }
 
 void Scene::render() const
@@ -164,7 +160,7 @@ void Scene::setRenderExternalSprings(bool renderExternalSprings)
 
 Simulation& Scene::getSimulation()
 {
-	return m_simulation;
+	return *m_simulation;
 }
 
 Model& Scene::getControlCube()

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "controlCube.hpp"
+#include "elasticCube.hpp"
+#include "model.hpp"
 #include "state.hpp"
 
 #include <glm/glm.hpp>
@@ -13,7 +16,10 @@
 class Simulation
 {
 public:
-	Simulation();
+	static constexpr glm::vec3 cubeSize{1, 1, 1};
+
+	Simulation(Model& bezierCubeModel, Model& internalSpringsModel, Model& controlCubeModel,
+		Model& externalSpringsModel);
 	void update();
 	void stop();
 	void start();
@@ -38,7 +44,6 @@ public:
 
 	int getIterations() const;
 	float getT() const;
-	glm::quat getOrientation() const;
 
 private:
 	bool m_running = false;
@@ -55,8 +60,27 @@ private:
 
 	std::chrono::time_point<std::chrono::system_clock> m_t0{};
 	std::vector<float> m_t{};
+	
+	Model& m_bezierCubeModel;
+	Model& m_internalSpringsModel;
+	Model& m_controlCubeModel;
+	Model& m_externalSpringsModel;
+	
+	ElasticCube m_elasticCube{cubeSize};
+	ControlCube m_controlCube{cubeSize};
 
 	float getSimulationTime() const;
 	void resetTime();
 	State getRHS(const State& state) const;
+
+	void updateModels() const;
+	void updateBezierCubeModel() const;
+	void updateInternalSpringsModel() const;
+	void updateControlCubeModel() const;
+	void updateExternalSpringsModel() const;
+
+	std::vector<glm::vec3> internalSpringsForces();
+	std::vector<glm::vec3> externalSpringsForces();
+	std::vector<glm::vec3> dampingForces();
+	std::vector<glm::vec3> gravityForces();
 };

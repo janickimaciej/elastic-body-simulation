@@ -10,14 +10,13 @@
 
 struct State
 {
-	static constexpr std::size_t stateLength = 7;
+	static constexpr std::size_t stateLength = 3 * 128;
 
-	glm::quat orientation{1, 0, 0, 0};
-	glm::vec3 angVelocity{0, 0, 0};
+	std::array<glm::vec3, 64> positions;
+	std::array<glm::vec3, 64> velocities;
 
 	State() = default;
 	State(const RungeKutta::State& state);
 
 	RungeKutta::State toArray() const;
-	void normalize();
 };

@@ -7,7 +7,7 @@
 class RungeKutta
 {
 public:
-	static constexpr std::size_t stateLength = 7;
+	static constexpr std::size_t stateLength = 3 * 128;
 	using State = std::array<float, stateLength>;
 	using RHS = std::function<State(float, const State&)>;
 

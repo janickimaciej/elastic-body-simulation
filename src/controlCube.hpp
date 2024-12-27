@@ -12,23 +12,13 @@ class ElasticCube;
 class ControlCube
 {
 public:
-	ControlCube(const glm::vec3& size, Model& controlCubeModel, Model& externalSpringsModel);
-	void init(const ElasticCube* elasticCube);
+	ControlCube(const glm::vec3& size);
 	std::vector<glm::vec3> getVertices() const;
 
 	static std::vector<glm::vec3> createVertices(const glm::vec3& size);
 
 private:
 	std::vector<glm::vec3> m_vertices{};
-	
-	Model& m_controlCubeModel;
-	Model& m_externalSpringsModel;
-
-	const ElasticCube* m_elasticCube{};
-
-	void updateModels() const;
-	void updateExternalSpringsModel() const;
-	void updateControlCubeModel() const;
 	
 	static std::size_t index(std::size_t xi, std::size_t yi, std::size_t zi);
 };
