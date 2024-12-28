@@ -398,7 +398,7 @@ bool Simulation::processCollision(bool isWallPositive, float wallPosition, float
 	if (isWallPositive ? wallDistance > 0 : wallDistance < 0)
 	{
 		particlePosition = wallPosition - m_collisionElasticity * wallDistance;
-		particleVelocity *= m_collisionElasticity;
+		particleVelocity *= -m_collisionElasticity;
 		return true;
 	}
 	return false;
