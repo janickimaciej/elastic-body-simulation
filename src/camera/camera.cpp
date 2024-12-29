@@ -3,11 +3,13 @@
 #include <glm/gtc/constants.hpp>
 
 Camera::Camera(float aspectRatio, float nearPlane, float farPlane,
-	const ShaderProgram& meshShaderProgram, const ShaderProgram& linesShaderProgram) :
+	const ShaderProgram& bezierShaderProgram, const ShaderProgram& teapotShaderProgram,
+	const ShaderProgram& linesShaderProgram) :
 	m_aspectRatio{aspectRatio},
 	m_nearPlane{nearPlane},
 	m_farPlane{farPlane},
-	m_meshShaderProgram{meshShaderProgram},
+	m_bezierShaderProgram{bezierShaderProgram},
+	m_teapotShaderProgram{teapotShaderProgram},
 	m_linesShaderProgram{linesShaderProgram}
 {
 	updateViewMatrix();
@@ -108,9 +110,13 @@ glm::vec3 Camera::getPos() const
 
 void Camera::updateShaders() const
 {
-	m_meshShaderProgram.use();
-	m_meshShaderProgram.setUniform("projectionViewMatrix", getMatrix());
-	m_meshShaderProgram.setUniform("cameraPos", getPos());
+	m_bezierShaderProgram.use();
+	m_bezierShaderProgram.setUniform("projectionViewMatrix", getMatrix());
+	m_bezierShaderProgram.setUniform("cameraPos", getPos());
+
+	m_teapotShaderProgram.use();
+	m_teapotShaderProgram.setUniform("projectionViewMatrix", getMatrix());
+	m_teapotShaderProgram.setUniform("cameraPos", getPos());
 
 	m_linesShaderProgram.use();
 	m_linesShaderProgram.setUniform("projectionViewMatrix", getMatrix());

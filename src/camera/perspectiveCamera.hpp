@@ -7,7 +7,8 @@ class PerspectiveCamera : public Camera
 {
 public:
 	PerspectiveCamera(float fovYDeg, float aspectRatio, float nearPlane, float farPlane,
-		const ShaderProgram& meshShaderProgram, const ShaderProgram& linesShaderProgram);
+		const ShaderProgram& bezierShaderProgram, const ShaderProgram& teapotShaderProgram,
+		const ShaderProgram& linesShaderProgram);
 	float getFOVYDeg() const;
 	void setFOVYDeg(float fovYDeg);
 	virtual void zoom(float zoom) override;

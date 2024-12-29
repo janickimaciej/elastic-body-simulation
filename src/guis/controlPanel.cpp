@@ -140,6 +140,13 @@ void ControlPanel::update()
 
 	updateCheckbox
 	(
+		[this] () { return m_scene.getRenderTeapot(); },
+		[this] (bool renderTeapot) { m_scene.setRenderTeapot(renderTeapot); },
+		"render teapot"
+	);
+
+	updateCheckbox
+	(
 		[this] () { return m_scene.getRenderInternalSprings(); },
 		[this] (bool renderInternalSprings)
 		{

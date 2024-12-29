@@ -1,11 +1,14 @@
 #include "scene.hpp"
 
 #include "mesh.hpp"
+#include "objParser.hpp"
 
 #include <glad/glad.h>
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <limits>
 #include <utility>
 #include <vector>
 
@@ -16,15 +19,19 @@ static constexpr float farPlane = 1000.0f;
 Scene::Scene(const glm::ivec2& viewportSize) :
 	m_viewportSize{viewportSize},
 	m_camera{fovYDeg, static_cast<float>(viewportSize.x) / viewportSize.y, nearPlane, farPlane,
-		m_meshShaderProgram, m_linesShaderProgram}
+		m_bezierShaderProgram, m_teapotShaderProgram, m_linesShaderProgram}
 {
 	static constexpr glm::vec4 constraintBoxColor{0, 0, 1, 1};
 	m_constraintBoxModel = std::make_unique<Model>(cubeLineMesh(Simulation::constraintBoxSize),
 		m_linesShaderProgram, constraintBoxColor, true);
 
 	static constexpr glm::vec4 bezierCubeColor{1, 1, 1, 1};
-	//m_bezierCubeModel = std::make_unique<Model>(bezierCubeMesh(Simulation::cubeSize),
-	//	m_meshShaderProgram, bezierCubeColor);
+	m_bezierCubeModel = std::make_unique<Model>(bezierCubeMesh(Simulation::cubeSize),
+		m_bezierShaderProgram, bezierCubeColor);
+
+	static constexpr glm::vec4 teapotColor{0.3f, 0.3f, 0.3f, 1};
+	m_teapotModel = std::make_unique<Model>(objMesh("res/teapot.obj"), m_teapotShaderProgram,
+		teapotColor);
 
 	static constexpr glm::vec4 internalSpringsColor{1, 1, 1, 1};
 	m_internalSpringsModel = std::make_unique<Model>(internalSpringsMesh(Simulation::cubeSize),
@@ -45,6 +52,7 @@ Scene::Scene(const glm::ivec2& viewportSize) :
 void Scene::update()
 {
 	m_simulation->update();
+	updateTeapotShader();
 }
 
 void Scene::render() const
@@ -55,14 +63,6 @@ void Scene::render() const
 
 	m_camera.use();
 
-	if (m_renderConstraintBox)
-	{
-		m_constraintBoxModel->render();
-	}
-	if (m_renderBezierCube)
-	{
-		//m_bezierCubeModel->render();
-	}
 	if (m_renderInternalSprings)
 	{
 		m_internalSpringsModel->render();
@@ -74,6 +74,19 @@ void Scene::render() const
 	if (m_renderExternalSprings)
 	{
 		m_externalSpringsModel->render();
+	}
+	if (m_renderTeapot)
+	{
+		m_teapotModel->render();
+	}
+	if (m_renderBezierCube)
+	{
+		m_bezierCubeTexture.use();
+		m_bezierCubeModel->render();
+	}
+	if (m_renderConstraintBox)
+	{
+		m_constraintBoxModel->render();
 	}
 }
 
@@ -125,6 +138,16 @@ bool Scene::getRenderBezierCube() const
 void Scene::setRenderBezierCube(bool renderBezierCube)
 {
 	m_renderBezierCube = renderBezierCube;
+}
+
+bool Scene::getRenderTeapot() const
+{
+	return m_renderTeapot;
+}
+
+void Scene::setRenderTeapot(bool renderTeapot)
+{
+	m_renderTeapot = renderTeapot;
 }
 
 bool Scene::getRenderInternalSprings() const
@@ -186,7 +209,7 @@ Mesh Scene::cubeLineMesh(const glm::vec3& size)
 		3, 7
 	};
 
-	return Mesh{vertices, indices, true};
+	return Mesh{vertices, indices, GL_LINES};
 }
 
 Mesh Scene::bezierCubeMesh(const glm::vec3& size)
@@ -197,9 +220,51 @@ Mesh Scene::bezierCubeMesh(const glm::vec3& size)
 		vertices.push_back({vertexPos, {}});
 	}
 
-	std::vector<unsigned int> indices{}; // TODO
+	std::vector<unsigned int> indices{};
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			indices.push_back(12 + 16 * i - 4 * j);
+		}
+	}
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			indices.push_back(3 + 16 * i + 4 * j);
+		}
+	}
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			indices.push_back(3 + 4 * i - j);
+		}
+	}
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			indices.push_back(48 + 4 * i + j);
+		}
+	}
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			indices.push_back(16 * i + j);
+		}
+	}
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			indices.push_back(15 + 16 * i - j);
+		}
+	}
 
-	return Mesh{vertices, indices, false, true};
+	return Mesh{vertices, indices, GL_PATCHES, true};
 }
 
 Mesh Scene::internalSpringsMesh(const glm::vec3& size)
@@ -242,7 +307,73 @@ Mesh Scene::externalSpringsMesh(const glm::vec3& size)
 	return Mesh{vertices, indices, true, true};
 }
 
+Mesh Scene::objMesh(const std::string& path)
+{
+	std::vector<Mesh::Vertex> vertices = ObjParser::parse(path);
+
+	static constexpr float maxFloat = std::numeric_limits<float>::max();
+	glm::vec3 minPos{maxFloat, maxFloat, maxFloat};
+	glm::vec3 maxPos{-maxFloat, -maxFloat, -maxFloat};
+
+	for (const Mesh::Vertex& vertex : vertices)
+	{
+		if (vertex.pos.x < minPos.x)
+		{
+			minPos.x = vertex.pos.x;
+		}
+		if (vertex.pos.x > maxPos.x)
+		{
+			maxPos.x = vertex.pos.x;
+		}
+		if (vertex.pos.y < minPos.y)
+		{
+			minPos.y = vertex.pos.y;
+		}
+		if (vertex.pos.y > maxPos.y)
+		{
+			maxPos.y = vertex.pos.y;
+		}
+		if (vertex.pos.z < minPos.z)
+		{
+			minPos.z = vertex.pos.z;
+		}
+		if (vertex.pos.z > maxPos.z)
+		{
+			maxPos.z = vertex.pos.z;
+		}
+	}
+
+	glm::vec3 mean = (minPos + maxPos) / 2.0f;
+	glm::vec3 scales = 1.0f / (maxPos - minPos);
+	float scale = std::min(scales.x, std::min(scales.y, scales.z));
+
+	for (Mesh::Vertex& vertex : vertices)
+	{
+		vertex.pos -= mean;
+		vertex.pos *= scale;
+		vertex.pos += 0.5f;
+	}
+
+	std::vector<unsigned int> indices{};
+	for (unsigned int i = 0; i < vertices.size(); ++i)
+	{
+		indices.push_back(i);
+	}
+
+	return Mesh{vertices, indices, GL_TRIANGLES};
+}
+
 void Scene::setAspectRatio(float aspectRatio)
 {
 	m_camera.setAspectRatio(aspectRatio);
+}
+
+void Scene::updateTeapotShader() const
+{
+	m_teapotShaderProgram.use();
+	std::vector<glm::vec3> vertices = m_simulation->getElasticCube().getVertices();
+	for (int i = 0; i < vertices.size(); ++i)
+	{
+		m_teapotShaderProgram.setUniform("bezierPoints[" + std::to_string(i) + "]", vertices[i]);
+	}
 }

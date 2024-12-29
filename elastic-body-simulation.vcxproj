@@ -165,6 +165,7 @@
     <ClCompile Include="dep\implot\implot.cpp" />
     <ClCompile Include="dep\implot\implot_demo.cpp" />
     <ClCompile Include="dep\implot\implot_items.cpp" />
+    <ClCompile Include="dep\stb_image.cpp" />
     <ClCompile Include="src\controlCube.cpp" />
     <ClCompile Include="src\elasticCube.cpp" />
     <ClCompile Include="src\camera\camera.cpp" />
@@ -175,11 +176,13 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\objParser.cpp" />
     <ClCompile Include="src\rungeKutta.cpp" />
     <ClCompile Include="src\scene.cpp" />
     <ClCompile Include="src\shaderProgram.cpp" />
     <ClCompile Include="src\simulation.cpp" />
     <ClCompile Include="src\state.cpp" />
+    <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -194,6 +197,7 @@
     <ClInclude Include="dep\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="dep\implot\implot.h" />
     <ClInclude Include="dep\implot\implot_internal.h" />
+    <ClInclude Include="dep\stb_image.h" />
     <ClInclude Include="src\controlCube.hpp" />
     <ClInclude Include="src\frame.hpp" />
     <ClInclude Include="src\elasticCube.hpp" />
@@ -203,18 +207,24 @@
     <ClInclude Include="src\guis\gui.hpp" />
     <ClInclude Include="src\mesh.hpp" />
     <ClInclude Include="src\model.hpp" />
+    <ClInclude Include="src\objParser.hpp" />
     <ClInclude Include="src\rungeKutta.hpp" />
     <ClInclude Include="src\scene.hpp" />
     <ClInclude Include="src\shaderProgram.hpp" />
     <ClInclude Include="src\simulation.hpp" />
     <ClInclude Include="src\state.hpp" />
+    <ClInclude Include="src\texture.hpp" />
     <ClInclude Include="src\window.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\shaders\teapotFS.glsl" />
+    <None Include="src\shaders\teapotVS.glsl" />
+    <None Include="src\shaders\bezierTES.glsl" />
+    <None Include="src\shaders\bezierTCS.glsl" />
+    <None Include="src\shaders\bezierFS.glsl" />
+    <None Include="src\shaders\bezierVS.glsl" />
     <None Include="src\shaders\linesFS.glsl" />
     <None Include="src\shaders\linesVS.glsl" />
-    <None Include="src\shaders\meshFS.glsl" />
-    <None Include="src\shaders\meshVS.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

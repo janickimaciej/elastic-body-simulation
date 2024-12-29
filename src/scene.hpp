@@ -4,11 +4,13 @@
 #include "model.hpp"
 #include "shaderProgram.hpp"
 #include "simulation.hpp"
+#include "texture.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 #include <memory>
+#include <string>
 
 class Scene
 {
@@ -28,6 +30,8 @@ public:
 	void setRenderConstraintBox(bool renderConstraintBox);
 	bool getRenderBezierCube() const;
 	void setRenderBezierCube(bool renderBezierCube);
+	bool getRenderTeapot() const;
+	void setRenderTeapot(bool renderTeapot);
 	bool getRenderInternalSprings() const;
 	void setRenderInternalSprings(bool renderInternalSprings);
 	bool getRenderControlCube() const;
@@ -38,7 +42,9 @@ public:
 	Simulation& getSimulation();
 
 private:
-	ShaderProgram m_meshShaderProgram{"src/shaders/meshVS.glsl", "src/shaders/meshFS.glsl"};
+	ShaderProgram m_bezierShaderProgram{"src/shaders/bezierVS.glsl", "src/shaders/bezierTCS.glsl",
+		"src/shaders/bezierTES.glsl", "src/shaders/bezierFS.glsl"};
+	ShaderProgram m_teapotShaderProgram{"src/shaders/teapotVS.glsl", "src/shaders/teapotFS.glsl"};
 	ShaderProgram m_linesShaderProgram{"src/shaders/linesVS.glsl", "src/shaders/linesFS.glsl"};
 	glm::ivec2 m_viewportSize{};
 	PerspectiveCamera m_camera;
@@ -48,9 +54,13 @@ private:
 	std::unique_ptr<Model> m_internalSpringsModel{};
 	std::unique_ptr<Model> m_controlCubeModel{};
 	std::unique_ptr<Model> m_externalSpringsModel{};
+	std::unique_ptr<Model> m_teapotModel{};
+
+	Texture m_bezierCubeTexture{"res/sponge.jpg"};
 
 	bool m_renderConstraintBox = true;
 	bool m_renderBezierCube = true;
+	bool m_renderTeapot = true;
 	bool m_renderInternalSprings = false;
 	bool m_renderControlCube = true;
 	bool m_renderExternalSprings = false;
@@ -61,6 +71,8 @@ private:
 	static Mesh bezierCubeMesh(const glm::vec3& size);
 	static Mesh internalSpringsMesh(const glm::vec3& size);
 	static Mesh externalSpringsMesh(const glm::vec3& size);
+	static Mesh objMesh(const std::string& path);
 
 	void setAspectRatio(float aspectRatio);
+	void updateTeapotShader() const;
 };

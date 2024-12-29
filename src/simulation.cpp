@@ -216,6 +216,11 @@ float Simulation::getT() const
 	return m_t.back();
 }
 
+ElasticCube& Simulation::getElasticCube()
+{
+	return m_elasticCube;
+}
+
 ControlCube& Simulation::getControlCube()
 {
 	return m_controlCube;
@@ -286,7 +291,7 @@ void Simulation::updateBezierCubeModel() const
 	{
 		vertices.push_back({vertexPos, {}});
 	}
-	//m_bezierCubeModel.updateMesh(std::move(vertices));
+	m_bezierCubeModel.updateMesh(std::move(vertices));
 }
 
 void Simulation::updateInternalSpringsModel() const

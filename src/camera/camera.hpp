@@ -8,7 +8,8 @@ class Camera
 {
 public:
 	Camera(float aspectRatio, float nearPlane, float farPlane,
-		const ShaderProgram& meshShaderProgram, const ShaderProgram& polylineShaderProgram);
+		const ShaderProgram& bezierShaderProgram, const ShaderProgram& teapotShaderProgram,
+		const ShaderProgram& linesShaderProgram);
 	void use() const;
 	glm::mat4 getMatrix() const;
 	void setAspectRatio(float aspectRatio);
@@ -38,7 +39,8 @@ private:
 	float m_pitchRad = 0;
 	float m_yawRad = 0;
 
-	const ShaderProgram& m_meshShaderProgram;
+	const ShaderProgram& m_bezierShaderProgram;
+	const ShaderProgram& m_teapotShaderProgram;
 	const ShaderProgram& m_linesShaderProgram;
 
 	glm::vec3 getPos() const;

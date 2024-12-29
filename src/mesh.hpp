@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include <cstddef>
@@ -15,7 +16,7 @@ public:
 	};
 
 	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices,
-		bool drawLines = false, bool dynamic = false);
+		GLenum drawType = GL_TRIANGLES, bool dynamic = false);
 	Mesh(const Mesh&) = delete;
 	Mesh(Mesh&& mesh) noexcept;
 	~Mesh();
@@ -32,7 +33,7 @@ private:
 	unsigned int m_VBO{};
 	unsigned int m_EBO{};
 	unsigned int m_VAO{};
-	bool m_drawLines{};
+	GLenum m_drawType{};
 
 	void createVBO(const std::vector<Vertex>& vertices, bool dynamic);
 	void createEBO(const std::vector<unsigned int>& indices);

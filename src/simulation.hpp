@@ -51,6 +51,7 @@ public:
 	int getIterations() const;
 	float getT() const;
 
+	ElasticCube& getElasticCube();
 	ControlCube& getControlCube();
 
 private:

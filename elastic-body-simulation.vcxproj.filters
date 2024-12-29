@@ -29,6 +29,9 @@
     <ClCompile Include="src\elasticCube.cpp" />
     <ClCompile Include="src\controlCube.cpp" />
     <ClCompile Include="src\frame.cpp" />
+    <ClCompile Include="src\texture.cpp" />
+    <ClCompile Include="dep\stb_image.cpp" />
+    <ClCompile Include="src\objParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dep\imgui\backends\imgui_impl_glfw.h" />
@@ -57,11 +60,18 @@
     <ClInclude Include="src\elasticCube.hpp" />
     <ClInclude Include="src\controlCube.hpp" />
     <ClInclude Include="src\frame.hpp" />
+    <ClInclude Include="src\texture.hpp" />
+    <ClInclude Include="dep\stb_image.h" />
+    <ClInclude Include="src\objParser.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\meshFS.glsl" />
-    <None Include="src\shaders\meshVS.glsl" />
     <None Include="src\shaders\linesFS.glsl" />
     <None Include="src\shaders\linesVS.glsl" />
+    <None Include="src\shaders\bezierTES.glsl" />
+    <None Include="src\shaders\bezierTCS.glsl" />
+    <None Include="src\shaders\bezierFS.glsl" />
+    <None Include="src\shaders\bezierVS.glsl" />
+    <None Include="src\shaders\teapotFS.glsl" />
+    <None Include="src\shaders\teapotVS.glsl" />
   </ItemGroup>
 </Project>

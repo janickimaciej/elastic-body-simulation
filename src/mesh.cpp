@@ -1,10 +1,8 @@
 #include "mesh.hpp"
 
-#include <glad/glad.h>
-
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices,
-	bool drawLines, bool dynamic) :
-	m_drawLines{drawLines}
+	GLenum drawType, bool dynamic) :
+	m_drawType{drawType}
 {
 	createVBO(vertices, dynamic);
 	m_indexCount = indices.size();
@@ -18,7 +16,7 @@ Mesh::Mesh(Mesh&& mesh) noexcept
 	m_VBO = mesh.m_VBO;
 	m_EBO = mesh.m_EBO;
 	m_VAO = mesh.m_VAO;
-	m_drawLines = mesh.m_drawLines;
+	m_drawType = mesh.m_drawType;
 
 	mesh.m_isValid = false;
 }
@@ -36,7 +34,7 @@ Mesh& Mesh::operator=(Mesh&& mesh) noexcept
 	m_VBO = mesh.m_VBO;
 	m_EBO = mesh.m_EBO;
 	m_VAO = mesh.m_VAO;
-	m_drawLines = mesh.m_drawLines;
+	m_drawType = mesh.m_drawType;
 
 	mesh.m_isValid = false;
 
@@ -50,9 +48,12 @@ void Mesh::update(const std::vector<Vertex>& vertices) const
 
 void Mesh::render() const
 {
+	if (m_drawType == GL_PATCHES)
+	{
+		glPatchParameteri(GL_PATCH_VERTICES, 16);
+	}
 	glBindVertexArray(m_VAO);
-	glDrawElements(m_drawLines ? GL_LINES : GL_TRIANGLES, static_cast<GLsizei>(m_indexCount),
-		GL_UNSIGNED_INT, nullptr);
+	glDrawElements(m_drawType, static_cast<GLsizei>(m_indexCount), GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 }
 
