@@ -32,4 +32,6 @@ private:
 	void updateCheckbox(const std::function<bool()>& get, const std::function<void(bool)>& set,
 		const std::string& name);
 	void separator();
+
+	static void normalizeAngle(float& angleDeg);
 };

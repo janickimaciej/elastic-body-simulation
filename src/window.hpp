@@ -35,4 +35,5 @@ private:
 
 	static void cursorMovementCallback(GLFWwindow* windowPtr, double x, double y);
 	static void scrollCallback(GLFWwindow* windowPtr, double, double yOffset);
+	static void keyCallback(GLFWwindow* windowPtr, int key, int, int action, int);
 };

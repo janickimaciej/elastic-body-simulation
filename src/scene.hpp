@@ -60,7 +60,7 @@ private:
 
 	bool m_renderConstraintBox = true;
 	bool m_renderBezierCube = true;
-	bool m_renderTeapot = true;
+	bool m_renderTeapot = false;
 	bool m_renderInternalSprings = false;
 	bool m_renderControlCube = true;
 	bool m_renderExternalSprings = false;

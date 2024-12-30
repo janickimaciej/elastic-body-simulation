@@ -25,11 +25,11 @@ Scene::Scene(const glm::ivec2& viewportSize) :
 	m_constraintBoxModel = std::make_unique<Model>(cubeLineMesh(Simulation::constraintBoxSize),
 		m_linesShaderProgram, constraintBoxColor, true);
 
-	static constexpr glm::vec4 bezierCubeColor{1, 1, 1, 1};
+	static constexpr glm::vec4 bezierCubeColor{0, 1, 0, 0.8f};
 	m_bezierCubeModel = std::make_unique<Model>(bezierCubeMesh(Simulation::cubeSize),
 		m_bezierShaderProgram, bezierCubeColor);
 
-	static constexpr glm::vec4 teapotColor{0.3f, 0.3f, 0.3f, 1};
+	static constexpr glm::vec4 teapotColor{1, 1, 1, 1};
 	m_teapotModel = std::make_unique<Model>(objMesh("res/teapot.obj"), m_teapotShaderProgram,
 		teapotColor);
 

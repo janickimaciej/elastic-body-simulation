@@ -18,6 +18,7 @@ Window::Window()
 
 	glfwSetCursorPosCallback(m_windowPtr, cursorMovementCallback);
 	glfwSetScrollCallback(m_windowPtr, scrollCallback);
+	glfwSetKeyCallback(m_windowPtr, keyCallback);
 
 	gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 	glEnable(GL_DEPTH_TEST);
@@ -124,4 +125,21 @@ void Window::scrollCallback(GLFWwindow* windowPtr, double, double yOffset)
 
 	static constexpr float sensitivity = 1.1f;
 	window->m_scene->zoomCamera(std::pow(sensitivity, static_cast<float>(yOffset)));
+}
+
+void Window::keyCallback(GLFWwindow* windowPtr, int key, int, int action, int)
+{
+	Window* window = static_cast<Window*>(glfwGetWindowUserPointer(windowPtr));
+
+	if (key == GLFW_KEY_E && action == GLFW_PRESS)
+	{
+		bool externalSprings = window->m_scene->getSimulation().getExternalSprings();
+		window->m_scene->getSimulation().setExternalSprings(!externalSprings);
+	}
+
+	if (key == GLFW_KEY_G && action == GLFW_PRESS)
+	{
+		bool gravity = window->m_scene->getSimulation().getGravity();
+		window->m_scene->getSimulation().setGravity(!gravity);
+	}
 }

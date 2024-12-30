@@ -220,6 +220,7 @@ void ControlPanel::update()
 		[this] () { return glm::degrees(m_scene.getSimulation().getControlCube().getPitchRad()); },
 		[this] (float pitchDeg)
 		{
+			normalizeAngle(pitchDeg);
 			ControlCube& cube = m_scene.getSimulation().getControlCube();
 			cube.setPitchRad(glm::radians(pitchDeg));
 		},
@@ -232,6 +233,7 @@ void ControlPanel::update()
 		[this] () { return glm::degrees(m_scene.getSimulation().getControlCube().getYawRad()); },
 		[this] (float yawDeg)
 		{
+			normalizeAngle(yawDeg);
 			ControlCube& cube = m_scene.getSimulation().getControlCube();
 			cube.setYawRad(glm::radians(yawDeg));
 		},
@@ -244,6 +246,7 @@ void ControlPanel::update()
 		[this] () { return glm::degrees(m_scene.getSimulation().getControlCube().getRollRad()); },
 		[this] (float rollDeg)
 		{
+			normalizeAngle(rollDeg);
 			ControlCube& cube = m_scene.getSimulation().getControlCube();
 			cube.setRollRad(glm::radians(rollDeg));
 		},
@@ -350,4 +353,16 @@ void ControlPanel::separator()
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
+}
+
+void ControlPanel::normalizeAngle(float& angleDeg)
+{
+	while (angleDeg < -180)
+	{
+		angleDeg += 360;
+	}
+	while (angleDeg >= 180)
+	{
+		angleDeg -= 360;
+	}
 }

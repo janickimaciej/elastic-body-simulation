@@ -1,9 +1,13 @@
 #version 420 core
 
 layout (location = 0) in vec3 inPos;
+layout (location = 1) in vec3 inNormalVector;
 
 uniform vec3 bezierPoints[64];
 uniform mat4 projectionViewMatrix;
+
+out vec3 pos;
+out vec3 normalVector;
 
 vec3 deCasteljau2(vec3 a, vec3 b, float t);
 vec3 deCasteljau3(vec3 a, vec3 b, vec3 c, float t);
@@ -23,8 +27,10 @@ void main()
 		bezierPointsUV[i] = deCasteljau4(bezierPointsU[4 * i], bezierPointsU[4 * i + 1],
 			bezierPointsU[4 * i + 2], bezierPointsU[4 * i + 3], inPos.y);
 	}
-	gl_Position = projectionViewMatrix * vec4(deCasteljau4(bezierPointsUV[0], bezierPointsUV[1],
-		bezierPointsUV[2], bezierPointsUV[3], inPos.z), 1);
+	pos = deCasteljau4(bezierPointsUV[0], bezierPointsUV[1], bezierPointsUV[2],
+		bezierPointsUV[3], inPos.z);
+	gl_Position = projectionViewMatrix * vec4(pos, 1);
+	normalVector = inNormalVector;
 }
 
 vec3 deCasteljau2(vec3 a, vec3 b, float t)
@@ -34,10 +40,10 @@ vec3 deCasteljau2(vec3 a, vec3 b, float t)
 
 vec3 deCasteljau3(vec3 a, vec3 b, vec3 c, float t)
 {
-	return mix(deCasteljau2(a, b, t), deCasteljau2(b, c, t), t);
+	return deCasteljau2(mix(a, b, t), mix(b, c, t), t);
 }
 
 vec3 deCasteljau4(vec3 a, vec3 b, vec3 c, vec3 d, float t)
 {
-	return mix(deCasteljau3(a, b, c, t), deCasteljau3(b, c, d, t), t);
+	return deCasteljau3(mix(a, b, t), mix(b, c, t), mix(c, d, t), t);
 }
