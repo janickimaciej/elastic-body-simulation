@@ -15,7 +15,7 @@ std::vector<Mesh::Vertex> ObjParser::parse(const std::string& path)
 		assert(false);
 		return std::vector<Mesh::Vertex>{};
 	}
-		
+
 	std::vector<Mesh::Vertex> vertices{};
 
 	std::vector<glm::vec3> positions{};

@@ -14,7 +14,7 @@ public:
 	std::vector<glm::vec3> getVertices() const;
 	void setVertices(const std::vector<glm::vec3>& vertices);
 	std::vector<glm::vec3> getCorners() const;
-	
+
 	static std::vector<glm::vec3> createVertices(const glm::vec3& size);
 	static std::vector<glm::vec3> createCorners(const glm::vec3& size);
 	static std::vector<std::pair<std::size_t, std::size_t>> createSprings();

@@ -18,6 +18,6 @@ public:
 
 private:
 	std::vector<glm::vec3> m_vertices{};
-	
+
 	static std::size_t index(std::size_t xi, std::size_t yi, std::size_t zi);
 };

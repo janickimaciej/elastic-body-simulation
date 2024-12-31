@@ -17,7 +17,7 @@ public:
 	float getRollRad() const;
 	void setRollRad(float pitchRad);
 	glm::quat getOrientation() const;
-	
+
 protected:
 	glm::mat4 getMatrix() const;
 

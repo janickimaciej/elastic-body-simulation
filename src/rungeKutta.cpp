@@ -7,7 +7,7 @@ RungeKutta::State RungeKutta::RK4(float oldTime, float timeStep, const State& ol
 
 	float time{};
 	State state{};
-	
+
 	k[0] = rhs(oldTime, oldState);
 
 	time = oldTime + timeStep / 2;

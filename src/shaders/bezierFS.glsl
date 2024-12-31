@@ -12,9 +12,9 @@ out vec4 outColor;
 
 void main()
 {
-	const float ambient = 0.1f;
+	const float ambient = 0.2f;
 	const float diffuse = 0.4f;
-	const float specular = 0.5f;
+	const float specular = 0.4f;
 	const float shininess = 20.0f;
 
 	float brightness = ambient;

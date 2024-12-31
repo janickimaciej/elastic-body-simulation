@@ -7,13 +7,18 @@
 #include <algorithm>
 #include <cmath>
 
-Simulation::Simulation(Model& bezierCubeModel, Model& internalSpringsModel, Model& controlCubeModel,
-	Model& externalSpringsModel) :
+Simulation::Simulation(const std::vector<std::unique_ptr<Model>>& massPointModels, Model& bezierCubeModel,
+	Model& internalSpringsModel, Model& controlCubeModel, Model& externalSpringsModel) :
 	m_bezierCubeModel{bezierCubeModel},
 	m_internalSpringsModel{internalSpringsModel},
 	m_controlCubeModel{controlCubeModel},
 	m_externalSpringsModel{externalSpringsModel}
 {
+	for (const std::unique_ptr<Model>& massPointModel : massPointModels)
+	{
+		m_massPointModels.push_back(massPointModel.get());
+	}
+
 	start();
 	std::vector<glm::vec3> vertices = ElasticCube::createVertices(cubeSize);
 	std::copy(vertices.begin(), vertices.end(), m_state.positions.begin());
@@ -278,10 +283,20 @@ void Simulation::updateElasticCube()
 
 void Simulation::updateModels() const
 {
+	updateMassPointModels();
 	updateBezierCubeModel();
 	updateInternalSpringsModel();
 	updateControlCubeModel();
 	updateExternalSpringsModel();
+}
+
+void Simulation::updateMassPointModels() const
+{
+	std::vector<glm::vec3> vertices = m_elasticCube.getVertices();
+	for (int i = 0; i < 64; ++i)
+	{
+		m_massPointModels[i]->setPos(vertices[i]);
+	}
 }
 
 void Simulation::updateBezierCubeModel() const

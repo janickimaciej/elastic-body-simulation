@@ -11,6 +11,7 @@ out vec3 pos;
 out vec2 texturePos;
 out vec3 normalVector;
 
+int index(int ui, int vi);
 vec3 deCasteljau2(vec3 a, vec3 b, float t);
 vec3 deCasteljau3(vec3 a, vec3 b, vec3 c, float t);
 vec3 deCasteljau4(vec3 a, vec3 b, vec3 c, vec3 d, float t);
@@ -22,25 +23,33 @@ void main()
 	float v = gl_TessCoord.y;
 	texturePos = vec2(u / 2.0f, v / 2.0f);
 
-	vec3 bezierU[4];
-	for (int i = 0; i < 4; ++i)
+	vec3 bezierPointsU[4];
+	for (int vi = 0; vi < 4; ++vi)
 	{
-		bezierU[i] = deCasteljau4(tessPos[4 * i], tessPos[4 * i + 1], tessPos[4 * i + 2],
-			tessPos[4 * i + 3], u);
+		bezierPointsU[vi] = deCasteljau4(tessPos[index(0, vi)], tessPos[index(1, vi)],
+			tessPos[index(2, vi)], tessPos[index(3, vi)], u);
 	}
 
-	vec3 bezierV[4];
-	for (int i = 0; i < 4; ++i)
+	vec3 bezierPointsV[4];
+	for (int ui = 0; ui < 4; ++ui)
 	{
-		bezierV[i] = deCasteljau4(tessPos[i], tessPos[i + 4], tessPos[i + 8], tessPos[i + 12], v);
+		bezierPointsV[ui] = deCasteljau4(tessPos[index(ui, 0)], tessPos[index(ui, 1)],
+			tessPos[index(ui, 2)], tessPos[index(ui, 3)], v);
 	}
 
-	pos = deCasteljau4(bezierU[0], bezierU[1], bezierU[2], bezierU[3], v);
+	pos = deCasteljau4(bezierPointsU[0], bezierPointsU[1], bezierPointsU[2], bezierPointsU[3], v);
 	gl_Position = projectionViewMatrix * vec4(pos, 1);
 
-	vec3 derivU = deCasteljauDeriv4(bezierV[0], bezierV[1], bezierV[2], bezierV[3], u);
-	vec3 derivV = deCasteljauDeriv4(bezierU[0], bezierU[1], bezierU[2], bezierU[3], v);
+	vec3 derivU = deCasteljauDeriv4(bezierPointsV[0], bezierPointsV[1], bezierPointsV[2],
+		bezierPointsV[3], u);
+	vec3 derivV = deCasteljauDeriv4(bezierPointsU[0], bezierPointsU[1], bezierPointsU[2],
+		bezierPointsU[3], v);
 	normalVector = cross(derivU, derivV);
+}
+
+int index(int ui, int vi)
+{
+	return 4 * vi + ui;
 }
 
 vec3 deCasteljau2(vec3 a, vec3 b, float t)

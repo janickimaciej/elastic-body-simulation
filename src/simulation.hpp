@@ -20,8 +20,8 @@ public:
 	static constexpr glm::vec3 constraintBoxSize{10.0f, 5.0f, 5.0f};
 	static constexpr glm::vec3 cubeSize{1, 1, 1};
 
-	Simulation(Model& bezierCubeModel, Model& internalSpringsModel, Model& controlCubeModel,
-		Model& externalSpringsModel);
+	Simulation(const std::vector<std::unique_ptr<Model>>& massPointModels, Model& bezierCubeModel,
+		Model& internalSpringsModel, Model& controlCubeModel, Model& externalSpringsModel);
 	void update();
 	void stop();
 	void start();
@@ -71,12 +71,13 @@ private:
 
 	std::chrono::time_point<std::chrono::system_clock> m_t0{};
 	std::vector<float> m_t{};
-	
+
+	std::vector<Model*> m_massPointModels{};
 	Model& m_bezierCubeModel;
 	Model& m_internalSpringsModel;
 	Model& m_controlCubeModel;
 	Model& m_externalSpringsModel;
-	
+
 	ElasticCube m_elasticCube{cubeSize};
 	ControlCube m_controlCube{cubeSize};
 
@@ -92,6 +93,7 @@ private:
 	void updateElasticCube();
 
 	void updateModels() const;
+	void updateMassPointModels() const;
 	void updateBezierCubeModel() const;
 	void updateInternalSpringsModel() const;
 	void updateControlCubeModel() const;

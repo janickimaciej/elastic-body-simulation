@@ -26,6 +26,8 @@ public:
 	void moveYCamera(float y);
 	void zoomCamera(float zoom);
 
+	bool getRenderMassPoints() const;
+	void setRenderMassPoints(bool renderMassPoints);
 	bool getRenderConstraintBox() const;
 	void setRenderConstraintBox(bool renderConstraintBox);
 	bool getRenderBezierCube() const;
@@ -48,7 +50,8 @@ private:
 	ShaderProgram m_linesShaderProgram{"src/shaders/linesVS.glsl", "src/shaders/linesFS.glsl"};
 	glm::ivec2 m_viewportSize{};
 	PerspectiveCamera m_camera;
-	
+
+	std::vector<std::unique_ptr<Model>> m_massPointModels{};
 	std::unique_ptr<Model> m_constraintBoxModel{};
 	std::unique_ptr<Model> m_bezierCubeModel{};
 	std::unique_ptr<Model> m_internalSpringsModel{};
@@ -58,16 +61,18 @@ private:
 
 	Texture m_bezierCubeTexture{"res/sponge.jpg"};
 
+	bool m_renderMassPoints = false;
 	bool m_renderConstraintBox = true;
 	bool m_renderBezierCube = true;
 	bool m_renderTeapot = false;
 	bool m_renderInternalSprings = false;
 	bool m_renderControlCube = true;
 	bool m_renderExternalSprings = false;
-	
+
 	std::unique_ptr<Simulation> m_simulation{};
 
 	static Mesh cubeLineMesh(const glm::vec3& size);
+	static Mesh cubeMesh(const glm::vec3& size);
 	static Mesh bezierCubeMesh(const glm::vec3& size);
 	static Mesh internalSpringsMesh(const glm::vec3& size);
 	static Mesh externalSpringsMesh(const glm::vec3& size);

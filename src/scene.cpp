@@ -21,6 +21,15 @@ Scene::Scene(const glm::ivec2& viewportSize) :
 	m_camera{fovYDeg, static_cast<float>(viewportSize.x) / viewportSize.y, nearPlane, farPlane,
 		m_bezierShaderProgram, m_teapotShaderProgram, m_linesShaderProgram}
 {
+	static constexpr glm::vec4 massPointColor{1, 1, 1, 1};
+	static constexpr float massPointSize = 0.02f;
+	for (int i = 0; i < 64; ++i)
+	{
+		m_massPointModels.push_back(std::make_unique<Model>(
+			cubeMesh(glm::vec3{massPointSize, massPointSize, massPointSize}), m_linesShaderProgram,
+			massPointColor));
+	}
+
 	static constexpr glm::vec4 constraintBoxColor{0, 0, 1, 1};
 	m_constraintBoxModel = std::make_unique<Model>(cubeLineMesh(Simulation::constraintBoxSize),
 		m_linesShaderProgram, constraintBoxColor, true);
@@ -45,8 +54,8 @@ Scene::Scene(const glm::ivec2& viewportSize) :
 	m_externalSpringsModel = std::make_unique<Model>(externalSpringsMesh(Simulation::cubeSize),
 		m_linesShaderProgram, externalSpringsColor);
 
-	m_simulation = std::make_unique<Simulation>(*m_bezierCubeModel, *m_internalSpringsModel,
-		*m_controlCubeModel, *m_externalSpringsModel);
+	m_simulation = std::make_unique<Simulation>(m_massPointModels, *m_bezierCubeModel,
+		*m_internalSpringsModel, *m_controlCubeModel, *m_externalSpringsModel);
 }
 
 void Scene::update()
@@ -63,6 +72,13 @@ void Scene::render() const
 
 	m_camera.use();
 
+	if (m_renderMassPoints)
+	{
+		for (const std::unique_ptr<Model>& massPointModel : m_massPointModels)
+		{
+			massPointModel->render();
+		}
+	}
 	if (m_renderInternalSprings)
 	{
 		m_internalSpringsModel->render();
@@ -118,6 +134,16 @@ void Scene::moveYCamera(float y)
 void Scene::zoomCamera(float zoom)
 {
 	m_camera.zoom(zoom);
+}
+
+bool Scene::getRenderMassPoints() const
+{
+	return m_renderMassPoints;
+}
+
+void Scene::setRenderMassPoints(bool renderMassPoints)
+{
+	m_renderMassPoints = renderMassPoints;
 }
 
 bool Scene::getRenderConstraintBox() const
@@ -212,6 +238,38 @@ Mesh Scene::cubeLineMesh(const glm::vec3& size)
 	return Mesh{vertices, indices, GL_LINES};
 }
 
+Mesh Scene::cubeMesh(const glm::vec3& size)
+{
+	std::vector<Mesh::Vertex> vertices{};
+	for (const glm::vec3& vertexPos : ControlCube::createVertices(size))
+	{
+		vertices.push_back({vertexPos, {}});
+	}
+
+	std::vector<unsigned int> indices =
+	{
+		4, 0, 2,
+		4, 2, 6,
+
+		1, 5, 7,
+		1, 7, 3,
+
+		4, 5, 1,
+		4, 1, 0,
+
+		2, 3, 7,
+		2, 7, 6,
+
+		5, 4, 6,
+		5, 6, 7,
+
+		0, 1, 3,
+		0, 3, 2
+	};
+
+	return Mesh{vertices, indices, GL_TRIANGLES, false};
+}
+
 Mesh Scene::bezierCubeMesh(const glm::vec3& size)
 {
 	std::vector<Mesh::Vertex> vertices{};
@@ -274,7 +332,7 @@ Mesh Scene::internalSpringsMesh(const glm::vec3& size)
 	{
 		vertices.push_back({vertexPos, {}});
 	}
-	
+
 	std::vector<unsigned int> indices{};
 	for (const std::pair<std::size_t, std::size_t>& spring : ElasticCube::createShortSprings())
 	{

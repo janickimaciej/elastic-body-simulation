@@ -126,6 +126,13 @@ void ControlPanel::update()
 
 	updateCheckbox
 	(
+		[this] () { return m_scene.getRenderMassPoints(); },
+		[this] (bool renderMassPoints) { m_scene.setRenderMassPoints(renderMassPoints); },
+		"render mass points"
+	);
+
+	updateCheckbox
+	(
 		[this] () { return m_scene.getRenderConstraintBox(); },
 		[this] (bool renderConstraintBox) { m_scene.setRenderConstraintBox(renderConstraintBox); },
 		"render constraint box"
@@ -255,7 +262,7 @@ void ControlPanel::update()
 	);
 
 	separator();
-	
+
 	if (ImGui::Button("Disturb"))
 	{
 		m_simulation.disturb();
