@@ -10,7 +10,7 @@ Window::Window()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-	static const std::string windowTitle = "cad-opengl";
+	static const std::string windowTitle = "elastic-body-simulation";
 	m_windowPtr = glfwCreateWindow(m_size.x, m_size.y, windowTitle.c_str(), nullptr, nullptr);
 	glfwSetWindowUserPointer(m_windowPtr, this);
 	glfwMakeContextCurrent(m_windowPtr);
