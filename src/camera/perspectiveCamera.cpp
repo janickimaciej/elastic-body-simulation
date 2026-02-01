@@ -3,10 +3,8 @@
 #include <cmath>
 
 PerspectiveCamera::PerspectiveCamera(float fovYDeg, float aspectRatio, float nearPlane,
-	float farPlane, const ShaderProgram& bezierShaderProgram,
-	const ShaderProgram& teapotShaderProgram, const ShaderProgram& linesShaderProgram) :
-	Camera{aspectRatio, nearPlane, farPlane, bezierShaderProgram, teapotShaderProgram,
-		linesShaderProgram},
+	float farPlane) :
+	Camera{aspectRatio, nearPlane, farPlane},
 	m_fovYDeg{fovYDeg}
 {
 	updateProjectionMatrix();

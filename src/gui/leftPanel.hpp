@@ -9,17 +9,18 @@
 #include <optional>
 #include <string>
 
-class ControlPanel
+class LeftPanel
 {
 public:
-	ControlPanel(Scene& scene, Simulation& simulation, const glm::vec2& pos, const glm::vec2& size);
+	static constexpr int width = 360;
+
+	LeftPanel(Scene& scene, Simulation& simulation, const glm::ivec2& viewportSize);
 	void update();
 
 private:
 	Scene& m_scene;
 	Simulation& m_simulation;
-	const glm::vec2 m_pos;
-	const glm::vec2 m_size;
+	const glm::ivec2& m_viewportSize;
 
 	void updateInputFloat(const std::function<float()>& get, const std::function<void(float)>& set,
 		const std::string& name, std::optional<float> min = std::nullopt,

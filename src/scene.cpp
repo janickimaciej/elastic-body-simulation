@@ -2,6 +2,7 @@
 
 #include "mesh.hpp"
 #include "objParser.hpp"
+#include "shaderPrograms.hpp"
 
 #include <glad/glad.h>
 
@@ -18,41 +19,40 @@ static constexpr float farPlane = 1000.0f;
 
 Scene::Scene(const glm::ivec2& viewportSize) :
 	m_viewportSize{viewportSize},
-	m_camera{fovYDeg, static_cast<float>(viewportSize.x) / viewportSize.y, nearPlane, farPlane,
-		m_bezierShaderProgram, m_teapotShaderProgram, m_linesShaderProgram}
+	m_camera{fovYDeg, static_cast<float>(viewportSize.x) / viewportSize.y, nearPlane, farPlane}
 {
 	static constexpr glm::vec4 massPointColor{1, 1, 1, 1};
 	static constexpr float massPointSize = 0.02f;
 	for (int i = 0; i < 64; ++i)
 	{
 		m_massPointModels.push_back(std::make_unique<Model>(
-			cubeMesh(glm::vec3{massPointSize, massPointSize, massPointSize}), m_linesShaderProgram,
-			massPointColor));
+			cubeMesh(glm::vec3{massPointSize, massPointSize, massPointSize}),
+			*ShaderPrograms::lines, massPointColor));
 	}
 
 	static constexpr glm::vec4 constraintBoxColor{0, 0, 1, 1};
 	m_constraintBoxModel = std::make_unique<Model>(cubeLineMesh(Simulation::constraintBoxSize),
-		m_linesShaderProgram, constraintBoxColor, true);
+		*ShaderPrograms::lines, constraintBoxColor, true);
 
 	static constexpr glm::vec4 bezierCubeColor{0, 1, 0, 0.8f};
 	m_bezierCubeModel = std::make_unique<Model>(bezierCubeMesh(Simulation::cubeSize),
-		m_bezierShaderProgram, bezierCubeColor);
+		*ShaderPrograms::bezier, bezierCubeColor);
 
 	static constexpr glm::vec4 teapotColor{1, 1, 1, 1};
-	m_teapotModel = std::make_unique<Model>(objMesh("res/teapot.obj"), m_teapotShaderProgram,
+	m_teapotModel = std::make_unique<Model>(objMesh("res/teapot.obj"), *ShaderPrograms::teapot,
 		teapotColor);
 
 	static constexpr glm::vec4 internalSpringsColor{1, 1, 1, 1};
 	m_internalSpringsModel = std::make_unique<Model>(internalSpringsMesh(Simulation::cubeSize),
-		m_linesShaderProgram, internalSpringsColor);
+		*ShaderPrograms::lines, internalSpringsColor);
 
 	static constexpr glm::vec4 controlCubeColor{1, 0, 0, 1};
 	m_controlCubeModel = std::make_unique<Model>(cubeLineMesh(Simulation::cubeSize),
-		m_linesShaderProgram, controlCubeColor, true);
+		*ShaderPrograms::lines, controlCubeColor, true);
 
 	static constexpr glm::vec4 externalSpringsColor{1, 1, 1, 1};
 	m_externalSpringsModel = std::make_unique<Model>(externalSpringsMesh(Simulation::cubeSize),
-		m_linesShaderProgram, externalSpringsColor);
+		*ShaderPrograms::lines, externalSpringsColor);
 
 	m_simulation = std::make_unique<Simulation>(m_massPointModels, *m_bezierCubeModel,
 		*m_internalSpringsModel, *m_controlCubeModel, *m_externalSpringsModel);
@@ -106,7 +106,7 @@ void Scene::render() const
 	}
 }
 
-void Scene::updateWindowSize()
+void Scene::updateViewportSize()
 {
 	setAspectRatio(static_cast<float>(m_viewportSize.x) / m_viewportSize.y);
 }
@@ -428,10 +428,10 @@ void Scene::setAspectRatio(float aspectRatio)
 
 void Scene::updateTeapotShader() const
 {
-	m_teapotShaderProgram.use();
+	ShaderPrograms::teapot->use();
 	std::vector<glm::vec3> vertices = m_simulation->getElasticCube().getVertices();
 	for (int i = 0; i < vertices.size(); ++i)
 	{
-		m_teapotShaderProgram.setUniform("bezierPoints[" + std::to_string(i) + "]", vertices[i]);
+		ShaderPrograms::teapot->setUniform("bezierPoints[" + std::to_string(i) + "]", vertices[i]);
 	}
 }

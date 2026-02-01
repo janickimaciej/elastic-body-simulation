@@ -7,8 +7,9 @@
 #include <algorithm>
 #include <cmath>
 
-Simulation::Simulation(const std::vector<std::unique_ptr<Model>>& massPointModels, Model& bezierCubeModel,
-	Model& internalSpringsModel, Model& controlCubeModel, Model& externalSpringsModel) :
+Simulation::Simulation(const std::vector<std::unique_ptr<Model>>& massPointModels,
+	Model& bezierCubeModel, Model& internalSpringsModel, Model& controlCubeModel,
+	Model& externalSpringsModel) :
 	m_bezierCubeModel{bezierCubeModel},
 	m_internalSpringsModel{internalSpringsModel},
 	m_controlCubeModel{controlCubeModel},

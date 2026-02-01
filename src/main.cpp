@@ -1,15 +1,13 @@
-#include "guis/gui.hpp"
+#include "gui/gui.hpp"
 #include "scene.hpp"
 #include "window.hpp"
-
-#include <glm/glm.hpp>
 
 int main()
 {
 	Window window{};
 	Scene scene{window.viewportSize()};
-	GUI gui{window.getPtr(), scene};
-	window.setWindowData(scene, gui);
+	GUI gui{window.getPtr(), scene, window.viewportSize()};
+	window.init(scene);
 
 	while (!window.shouldClose())
 	{

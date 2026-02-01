@@ -1,16 +1,13 @@
 #include "camera/camera.hpp"
 
+#include "shaderPrograms.hpp"
+
 #include <glm/gtc/constants.hpp>
 
-Camera::Camera(float aspectRatio, float nearPlane, float farPlane,
-	const ShaderProgram& bezierShaderProgram, const ShaderProgram& teapotShaderProgram,
-	const ShaderProgram& linesShaderProgram) :
+Camera::Camera(float aspectRatio, float nearPlane, float farPlane) :
 	m_aspectRatio{aspectRatio},
 	m_nearPlane{nearPlane},
-	m_farPlane{farPlane},
-	m_bezierShaderProgram{bezierShaderProgram},
-	m_teapotShaderProgram{teapotShaderProgram},
-	m_linesShaderProgram{linesShaderProgram}
+	m_farPlane{farPlane}
 {
 	updateViewMatrix();
 }
@@ -110,14 +107,14 @@ glm::vec3 Camera::getPos() const
 
 void Camera::updateShaders() const
 {
-	m_bezierShaderProgram.use();
-	m_bezierShaderProgram.setUniform("projectionViewMatrix", getMatrix());
-	m_bezierShaderProgram.setUniform("cameraPos", getPos());
+	ShaderPrograms::bezier->use();
+	ShaderPrograms::bezier->setUniform("projectionViewMatrix", getMatrix());
+	ShaderPrograms::bezier->setUniform("cameraPos", getPos());
 
-	m_teapotShaderProgram.use();
-	m_teapotShaderProgram.setUniform("projectionViewMatrix", getMatrix());
-	m_teapotShaderProgram.setUniform("cameraPos", getPos());
+	ShaderPrograms::teapot->use();
+	ShaderPrograms::teapot->setUniform("projectionViewMatrix", getMatrix());
+	ShaderPrograms::teapot->setUniform("cameraPos", getPos());
 
-	m_linesShaderProgram.use();
-	m_linesShaderProgram.setUniform("projectionViewMatrix", getMatrix());
+	ShaderPrograms::lines->use();
+	ShaderPrograms::lines->setUniform("projectionViewMatrix", getMatrix());
 }

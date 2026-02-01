@@ -1,6 +1,6 @@
 #pragma once
 
-#include "guis/controlPanel.hpp"
+#include "gui/leftPanel.hpp"
 #include "scene.hpp"
 
 #include <glad/glad.h>
@@ -10,13 +10,12 @@
 class GUI
 {
 public:
-	GUI(GLFWwindow* window, Scene& scene);
+	GUI(GLFWwindow* window, Scene& scene, const glm::ivec2& viewportSize);
 	~GUI();
 
 	void update();
 	void render();
 
 private:
-	Scene& m_scene;
-	ControlPanel m_controlPanel;
+	LeftPanel m_leftPanel;
 };

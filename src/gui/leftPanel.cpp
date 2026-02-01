@@ -1,4 +1,4 @@
-#include "guis/controlPanel.hpp"
+#include "gui/leftPanel.hpp"
 
 #include "controlCube.hpp"
 
@@ -7,19 +7,17 @@
 #include <algorithm>
 #include <limits>
 
-ControlPanel::ControlPanel(Scene& scene, Simulation& simulation, const glm::vec2& pos,
-	const glm::vec2& size) :
+LeftPanel::LeftPanel(Scene& scene, Simulation& simulation, const glm::ivec2& viewportSize) :
 	m_scene{scene},
 	m_simulation{simulation},
-	m_pos{pos},
-	m_size{size}
+	m_viewportSize{viewportSize}
 { }
 
-void ControlPanel::update()
+void LeftPanel::update()
 {
-	ImGui::SetNextWindowPos({m_pos.x, m_pos.y}, ImGuiCond_Always);
-	ImGui::SetNextWindowSize({m_size.x, m_size.y}, ImGuiCond_Always);
-	ImGui::Begin("controlPanel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+	ImGui::SetNextWindowPos({0, 0}, ImGuiCond_Always);
+	ImGui::SetNextWindowSize({width, static_cast<float>(m_viewportSize.y)}, ImGuiCond_Always);
+	ImGui::Begin("leftPanel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 
 	if (ImGui::Button("Start"))
 	{
@@ -271,11 +269,11 @@ void ControlPanel::update()
 	ImGui::End();
 }
 
-void ControlPanel::updateInputFloat(const std::function<float()>& get,
+void LeftPanel::updateInputFloat(const std::function<float()>& get,
 	const std::function<void(float)>& set, const std::string& name, std::optional<float> min,
 	std::optional<float> max, const std::string& format, float step)
 {
-	static const std::string suffix = "##controlPanelInputFloat";
+	static const std::string suffix = "##leftPanelInputFloat";
 
 	ImGui::PushItemWidth(100);
 
@@ -298,10 +296,10 @@ void ControlPanel::updateInputFloat(const std::function<float()>& get,
 	ImGui::PopItemWidth();
 }
 
-void ControlPanel::updateInputInt(const std::function<int()>& get,
+void LeftPanel::updateInputInt(const std::function<int()>& get,
 	const std::function<void(int)>& set, const std::string& name, std::optional<int> min)
 {
-	static const std::string suffix = "##controlPanelInputInt";
+	static const std::string suffix = "##leftPanelInputInt";
 	static constexpr int step = 100;
 
 	ImGui::PushItemWidth(100);
@@ -321,10 +319,10 @@ void ControlPanel::updateInputInt(const std::function<int()>& get,
 	ImGui::PopItemWidth();
 }
 
-void ControlPanel::updateDragFloat(const std::function<float()>& get,
+void LeftPanel::updateDragFloat(const std::function<float()>& get,
 	const std::function<void(float)>& set, const std::string& name, float velocity)
 {
-	static const std::string suffix = "##controlPanelDragFloat";
+	static const std::string suffix = "##leftPanelDragFloat";
 
 	ImGui::PushItemWidth(100);
 
@@ -341,10 +339,10 @@ void ControlPanel::updateDragFloat(const std::function<float()>& get,
 	ImGui::PopItemWidth();
 }
 
-void ControlPanel::updateCheckbox(const std::function<bool()>& get,
+void LeftPanel::updateCheckbox(const std::function<bool()>& get,
 	const std::function<void(bool)>& set, const std::string& name)
 {
-	static const std::string suffix = "##controlPanelCheckbox";
+	static const std::string suffix = "##leftPanelCheckbox";
 
 	bool value = get();
 	bool prevValue = value;
@@ -355,14 +353,14 @@ void ControlPanel::updateCheckbox(const std::function<bool()>& get,
 	}
 }
 
-void ControlPanel::separator()
+void LeftPanel::separator()
 {
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
 }
 
-void ControlPanel::normalizeAngle(float& angleDeg)
+void LeftPanel::normalizeAngle(float& angleDeg)
 {
 	while (angleDeg < -180)
 	{

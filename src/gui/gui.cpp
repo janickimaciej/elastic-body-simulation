@@ -1,17 +1,14 @@
-#include "guis/gui.hpp"
+#include "gui/gui.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
-#include <implot/implot.h>
 
-GUI::GUI(GLFWwindow* window, Scene& scene) :
-	m_scene{scene},
-	m_controlPanel{scene, scene.getSimulation(), {0, 0}, {360, 1000}}
+GUI::GUI(GLFWwindow* window, Scene& scene, const glm::ivec2& viewportSize) :
+	m_leftPanel{scene, scene.getSimulation(), viewportSize}
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImPlot::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -23,7 +20,6 @@ GUI::~GUI()
 {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
-	ImPlot::DestroyContext();
 	ImGui::DestroyContext();
 }
 
@@ -33,7 +29,7 @@ void GUI::update()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui::NewFrame();
 
-	m_controlPanel.update();
+	m_leftPanel.update();
 }
 
 void GUI::render()

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "guis/gui.hpp"
+#include "gui/leftPanel.hpp"
 #include "scene.hpp"
 
 #include <glad/glad.h>
@@ -13,27 +13,41 @@ public:
 	Window();
 	~Window();
 
-	glm::ivec2 viewportSize() const;
-	void setWindowData(Scene& scene, GUI& gui);
+	void init(Scene& scene);
 	bool shouldClose() const;
 	void swapBuffers() const;
 	void pollEvents() const;
+
+	const glm::ivec2& viewportSize() const;
 	GLFWwindow* getPtr();
 
 private:
-	static constexpr glm::ivec2 m_size{1900, 1000};
-	static constexpr glm::ivec2 m_viewportPos{360, 0};
-	static constexpr glm::ivec2 m_viewportSize = m_size - m_viewportPos;
+	static constexpr glm::ivec2 m_initialSize{1900, 1000};
 
 	GLFWwindow* m_windowPtr{};
+	glm::ivec2 m_viewportSize{m_initialSize - glm::ivec2{LeftPanel::width, 0}};
 	Scene* m_scene{};
-	GUI* m_gui{};
 
 	glm::vec2 m_lastCursorPos{};
 
-	glm::vec2 cursorPos() const;
+	void resizeCallback(int width, int height);
+	void cursorMovementCallback(double x, double y);
+	void scrollCallback(double, double yOffset);
+	void keyCallback(int key, int, int action, int);
 
-	static void cursorMovementCallback(GLFWwindow* windowPtr, double x, double y);
-	static void scrollCallback(GLFWwindow* windowPtr, double, double yOffset);
-	static void keyCallback(GLFWwindow* windowPtr, int key, int, int action, int);
+	void updateViewport() const;
+	glm::vec2 getCursorPos() const;
+	bool isButtonPressed(int button);
+	bool isKeyPressed(int key);
+	bool isCursorInGUI();
+
+	template <auto callback, typename... Args>
+	static void callbackWrapper(GLFWwindow* windowPtr, Args... args);
 };
+
+template <auto callback, typename... Args>
+void Window::callbackWrapper(GLFWwindow* windowPtr, Args... args)
+{
+	Window* window = static_cast<Window*>(glfwGetWindowUserPointer(windowPtr));
+	(window->*callback)(args...);
+}

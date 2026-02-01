@@ -2,7 +2,6 @@
 
 #include "camera/perspectiveCamera.hpp"
 #include "model.hpp"
-#include "shaderProgram.hpp"
 #include "simulation.hpp"
 #include "texture.hpp"
 
@@ -18,7 +17,7 @@ public:
 	Scene(const glm::ivec2& viewportSize);
 	void update();
 	void render() const;
-	void updateWindowSize();
+	void updateViewportSize();
 
 	void addPitchCamera(float pitchRad);
 	void addYawCamera(float yawRad);
@@ -44,11 +43,7 @@ public:
 	Simulation& getSimulation();
 
 private:
-	ShaderProgram m_bezierShaderProgram{"src/shaders/bezierVS.glsl", "src/shaders/bezierTCS.glsl",
-		"src/shaders/bezierTES.glsl", "src/shaders/bezierFS.glsl"};
-	ShaderProgram m_teapotShaderProgram{"src/shaders/teapotVS.glsl", "src/shaders/teapotFS.glsl"};
-	ShaderProgram m_linesShaderProgram{"src/shaders/linesVS.glsl", "src/shaders/linesFS.glsl"};
-	glm::ivec2 m_viewportSize{};
+	const glm::ivec2& m_viewportSize{};
 	PerspectiveCamera m_camera;
 
 	std::vector<std::unique_ptr<Model>> m_massPointModels{};

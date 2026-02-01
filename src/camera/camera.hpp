@@ -2,14 +2,10 @@
 
 #include <glm/glm.hpp>
 
-#include "shaderProgram.hpp"
-
 class Camera
 {
 public:
-	Camera(float aspectRatio, float nearPlane, float farPlane,
-		const ShaderProgram& bezierShaderProgram, const ShaderProgram& teapotShaderProgram,
-		const ShaderProgram& linesShaderProgram);
+	Camera(float aspectRatio, float nearPlane, float farPlane);
 	void use() const;
 	glm::mat4 getMatrix() const;
 	void setAspectRatio(float aspectRatio);
@@ -38,10 +34,6 @@ private:
 	glm::vec3 m_targetPos{0, 0, 0};
 	float m_pitchRad = 0;
 	float m_yawRad = 0;
-
-	const ShaderProgram& m_bezierShaderProgram;
-	const ShaderProgram& m_teapotShaderProgram;
-	const ShaderProgram& m_linesShaderProgram;
 
 	glm::vec3 getPos() const;
 	void updateShaders() const;
