@@ -13,14 +13,19 @@
 #include <utility>
 #include <vector>
 
-static constexpr float fovYDeg = 60.0f;
 static constexpr float nearPlane = 0.1f;
 static constexpr float farPlane = 1000.0f;
+static constexpr float fovYDeg = 60.0f;
 
 Scene::Scene(const glm::ivec2& viewportSize) :
-	m_viewportSize{viewportSize},
-	m_camera{fovYDeg, static_cast<float>(viewportSize.x) / viewportSize.y, nearPlane, farPlane}
+	m_camera{viewportSize, nearPlane, farPlane, fovYDeg}
 {
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_MULTISAMPLE);
+
 	static constexpr glm::vec4 massPointColor{1, 1, 1, 1};
 	static constexpr float massPointSize = 0.02f;
 	for (int i = 0; i < 64; ++i)
@@ -108,7 +113,7 @@ void Scene::render() const
 
 void Scene::updateViewportSize()
 {
-	setAspectRatio(static_cast<float>(m_viewportSize.x) / m_viewportSize.y);
+	m_camera.updateViewportSize();
 }
 
 void Scene::addPitchCamera(float pitchRad)
@@ -419,11 +424,6 @@ Mesh Scene::objMesh(const std::string& path)
 	}
 
 	return Mesh{vertices, indices, GL_TRIANGLES};
-}
-
-void Scene::setAspectRatio(float aspectRatio)
-{
-	m_camera.setAspectRatio(aspectRatio);
 }
 
 void Scene::updateTeapotShader() const

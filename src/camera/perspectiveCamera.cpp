@@ -2,9 +2,9 @@
 
 #include <cmath>
 
-PerspectiveCamera::PerspectiveCamera(float fovYDeg, float aspectRatio, float nearPlane,
-	float farPlane) :
-	Camera{aspectRatio, nearPlane, farPlane},
+PerspectiveCamera::PerspectiveCamera(const glm::ivec2& viewportSize, float nearPlane,
+	float farPlane, float fovYDeg) :
+	Camera{viewportSize, nearPlane, farPlane},
 	m_fovYDeg{fovYDeg}
 {
 	updateProjectionMatrix();
@@ -34,7 +34,7 @@ void PerspectiveCamera::updateProjectionMatrix()
 
 	m_projectionMatrix =
 	{
-		cot / m_aspectRatio, 0, 0, 0,
+		cot / getAspectRatio(), 0, 0, 0,
 		0, cot, 0, 0,
 		0, 0, -(m_farPlane + m_nearPlane) / (m_farPlane - m_nearPlane), -1,
 		0, 0, -2 * m_farPlane * m_nearPlane / (m_farPlane - m_nearPlane), 0

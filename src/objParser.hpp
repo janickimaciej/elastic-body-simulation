@@ -17,8 +17,8 @@ public:
 	~ObjParser() = delete;
 
 private:
-	static glm::vec3 parsePosition(const std::string_view line);
+	static glm::vec3 parsePos(const std::string_view line);
 	static glm::vec3 parseNormalVector(const std::string_view line);
 	static std::array<Mesh::Vertex, 3> parseTriangle(const std::string_view line,
-		const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normalVectors);
+		const std::vector<glm::vec3>& pos, const std::vector<glm::vec3>& normalVectors);
 };

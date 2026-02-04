@@ -25,11 +25,6 @@ Window::Window()
 	glfwSetKeyCallback(m_windowPtr, callbackWrapper<&Window::keyCallback>);
 
 	gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_MULTISAMPLE);
 
 	updateViewport();
 	ShaderPrograms::init();
@@ -84,9 +79,9 @@ void Window::resizeCallback(int width, int height)
 
 void Window::cursorMovementCallback(double x, double y)
 {
-	glm::vec2 currentPos{static_cast<float>(x), static_cast<float>(y)};
-	glm::vec2 offset = currentPos - m_lastCursorPos;
-	m_lastCursorPos = currentPos;
+	glm::vec2 currPos{static_cast<float>(x), static_cast<float>(y)};
+	glm::vec2 offset = currPos - m_lastCursorPos;
+	m_lastCursorPos = currPos;
 
 	if ((!isKeyPressed(GLFW_KEY_LEFT_SHIFT) &&
 		isButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE))

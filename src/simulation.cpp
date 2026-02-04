@@ -22,7 +22,7 @@ Simulation::Simulation(const std::vector<std::unique_ptr<Model>>& massPointModel
 
 	start();
 	std::vector<glm::vec3> vertices = ElasticCube::createVertices(cubeSize);
-	std::copy(vertices.begin(), vertices.end(), m_state.positions.begin());
+	std::copy(vertices.begin(), vertices.end(), m_state.poss.begin());
 }
 
 void Simulation::update()
@@ -250,7 +250,7 @@ State Simulation::getRHS(const State& state) const
 
 	for (int i = 0; i < 64; ++i)
 	{
-		stateDerivative.positions[i] = state.velocities[i];
+		stateDerivative.poss[i] = state.velocities[i];
 	}
 
 	std::vector<glm::vec3> internalSpringsForces = getInternalSpringsForces(state);
@@ -278,7 +278,7 @@ State Simulation::getRHS(const State& state) const
 void Simulation::updateElasticCube()
 {
 	std::vector<glm::vec3> vertices(64);
-	std::copy(m_state.positions.begin(), m_state.positions.end(), vertices.begin());
+	std::copy(m_state.poss.begin(), m_state.poss.end(), vertices.begin());
 	m_elasticCube.setVertices(vertices);
 }
 
@@ -350,7 +350,7 @@ std::vector<glm::vec3> Simulation::getInternalSpringsForces(const State& state) 
 	{
 		float equilibriumLength = glm::length(referenceVertices[spring.second] -
 			referenceVertices[spring.first]);
-		glm::vec3 springVector = state.positions[spring.second] - state.positions[spring.first];
+		glm::vec3 springVector = state.poss[spring.second] - state.poss[spring.first];
 		glm::vec3 springDirection = glm::normalize(springVector);
 		float displacement = glm::length(springVector) - equilibriumLength;
 		glm::vec3 force = m_internalStiffness * displacement * springDirection;
@@ -367,7 +367,7 @@ std::vector<glm::vec3> Simulation::getExternalSpringsForces(const State& state) 
 	std::vector<std::size_t> cornerIndices = ElasticCube::cornerIndices();
 	for (int i = 0; i < 8; ++i)
 	{
-		glm::vec3 springVector = controlCubeCorners[i] - state.positions[cornerIndices[i]];
+		glm::vec3 springVector = controlCubeCorners[i] - state.poss[cornerIndices[i]];
 		forces[cornerIndices[i]] += m_externalStiffness * springVector;
 	}
 	return forces;
@@ -396,29 +396,29 @@ void Simulation::processCollisions()
 		while (collision)
 		{
 			collision = false;
-			collision |= processCollision(false, -constraintBoxSize.x / 2, m_state.positions[i].x,
+			collision |= processCollision(false, -constraintBoxSize.x / 2, m_state.poss[i].x,
 				m_state.velocities[i].x);
-			collision |= processCollision(true, constraintBoxSize.x / 2, m_state.positions[i].x,
+			collision |= processCollision(true, constraintBoxSize.x / 2, m_state.poss[i].x,
 				m_state.velocities[i].x);
-			collision |= processCollision(false, -constraintBoxSize.y / 2, m_state.positions[i].y,
+			collision |= processCollision(false, -constraintBoxSize.y / 2, m_state.poss[i].y,
 				m_state.velocities[i].y);
-			collision |= processCollision(true, constraintBoxSize.y / 2, m_state.positions[i].y,
+			collision |= processCollision(true, constraintBoxSize.y / 2, m_state.poss[i].y,
 				m_state.velocities[i].y);
-			collision |= processCollision(false, -constraintBoxSize.z / 2, m_state.positions[i].z,
+			collision |= processCollision(false, -constraintBoxSize.z / 2, m_state.poss[i].z,
 				m_state.velocities[i].z);
-			collision |= processCollision(true, constraintBoxSize.z / 2, m_state.positions[i].z,
+			collision |= processCollision(true, constraintBoxSize.z / 2, m_state.poss[i].z,
 				m_state.velocities[i].z);
 		}
 	}
 }
 
-bool Simulation::processCollision(bool isWallPositive, float wallPosition, float& particlePosition,
+bool Simulation::processCollision(bool isWallPositive, float wallPos, float& particlePos,
 	float& particleVelocity) const
 {
-	float wallDistance = particlePosition - wallPosition;
+	float wallDistance = particlePos - wallPos;
 	if (isWallPositive ? wallDistance > 0 : wallDistance < 0)
 	{
-		particlePosition = wallPosition - m_collisionElasticity * wallDistance;
+		particlePos = wallPos - m_collisionElasticity * wallDistance;
 		particleVelocity *= -m_collisionElasticity;
 		return true;
 	}

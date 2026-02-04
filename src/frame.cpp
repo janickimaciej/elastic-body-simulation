@@ -58,7 +58,7 @@ void Frame::updateMatrix()
 {
 	glm::mat4 orientationMatrix = glm::mat4_cast(getOrientation());
 
-	glm::mat4 positionMatrix
+	glm::mat4 posMatrix
 		{
 			1, 0, 0, 0,
 			0, 1, 0, 0,
@@ -66,5 +66,5 @@ void Frame::updateMatrix()
 			m_pos.x, m_pos.y, m_pos.z, 1
 		};
 
-	m_matrix = positionMatrix * orientationMatrix;
+	m_matrix = posMatrix * orientationMatrix;
 }

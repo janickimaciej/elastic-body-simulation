@@ -21,9 +21,6 @@
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\simulation.cpp" />
     <ClCompile Include="src\gui\leftPanel.cpp" />
-    <ClCompile Include="dep\implot\implot.cpp" />
-    <ClCompile Include="dep\implot\implot_demo.cpp" />
-    <ClCompile Include="dep\implot\implot_items.cpp" />
     <ClCompile Include="src\rungeKutta.cpp" />
     <ClCompile Include="src\state.cpp" />
     <ClCompile Include="src\elasticCube.cpp" />
@@ -54,8 +51,6 @@
     <ClInclude Include="src\model.hpp" />
     <ClInclude Include="src\simulation.hpp" />
     <ClInclude Include="src\gui\leftPanel.hpp" />
-    <ClInclude Include="dep\implot\implot.h" />
-    <ClInclude Include="dep\implot\implot_internal.h" />
     <ClInclude Include="src\rungeKutta.hpp" />
     <ClInclude Include="src\state.hpp" />
     <ClInclude Include="src\elasticCube.hpp" />

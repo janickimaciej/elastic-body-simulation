@@ -105,7 +105,7 @@ private:
 	std::vector<glm::vec3> getGravityForces() const;
 
 	void processCollisions();
-	bool processCollision(bool isWallPositive, float wallPosition, float& particlePosition,
+	bool processCollision(bool isWallPositive, float wallPos, float& particlePos,
 		float& particleVelocity) const;
 
 	float particleMass() const;

@@ -12,7 +12,7 @@ struct State
 {
 	static constexpr std::size_t stateLength = 3 * 128;
 
-	std::array<glm::vec3, 64> positions{};
+	std::array<glm::vec3, 64> poss{};
 	std::array<glm::vec3, 64> velocities{};
 
 	State() = default;

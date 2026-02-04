@@ -43,7 +43,6 @@ public:
 	Simulation& getSimulation();
 
 private:
-	const glm::ivec2& m_viewportSize{};
 	PerspectiveCamera m_camera;
 
 	std::vector<std::unique_ptr<Model>> m_massPointModels{};
@@ -73,6 +72,5 @@ private:
 	static Mesh externalSpringsMesh(const glm::vec3& size);
 	static Mesh objMesh(const std::string& path);
 
-	void setAspectRatio(float aspectRatio);
 	void updateTeapotShader() const;
 };
