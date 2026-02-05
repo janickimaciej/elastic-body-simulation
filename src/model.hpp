@@ -12,6 +12,7 @@ class Model : public Frame
 public:
 	Model(Mesh mesh, const ShaderProgram& shaderProgram, const glm::vec4& color,
 		bool depthOffset = false);
+	virtual ~Model() = default;
 
 	void updateMesh(const std::vector<Mesh::Vertex>& vertices);
 	void render() const;

@@ -12,8 +12,9 @@ class ControlCube : public Frame
 {
 public:
 	ControlCube(const glm::vec3& size);
-	std::vector<glm::vec3> getCorners() const;
+	virtual ~ControlCube() = default;
 
+	std::vector<glm::vec3> getCorners() const;
 	static std::vector<glm::vec3> createVertices(const glm::vec3& size);
 
 private:

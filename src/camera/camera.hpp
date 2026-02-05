@@ -6,6 +6,7 @@ class Camera
 {
 public:
 	Camera(const glm::ivec2& viewportSize, float nearPlane, float farPlane);
+	virtual ~Camera() = default;
 
 	void use() const;
 	glm::mat4 getMatrix() const;
@@ -24,8 +25,6 @@ protected:
 
 	glm::mat4 m_viewMatrixInverse{1};
 	glm::mat4 m_projectionMatrix{1};
-
-	float m_projectionPlane = 1;
 
 	void updateViewMatrix();
 	virtual void updateProjectionMatrix() = 0;
