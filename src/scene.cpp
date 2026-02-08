@@ -15,10 +15,10 @@
 
 static constexpr float nearPlane = 0.1f;
 static constexpr float farPlane = 1000.0f;
-static constexpr float fovYDeg = 60.0f;
+static constexpr float initFOVYDeg = 60.0f;
 
 Scene::Scene(const glm::ivec2& viewportSize) :
-	m_camera{viewportSize, nearPlane, farPlane, fovYDeg}
+	m_camera{viewportSize, nearPlane, farPlane, initFOVYDeg}
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
